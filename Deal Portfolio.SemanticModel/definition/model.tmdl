@@ -1,0 +1,69 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Deal Financials","UID - Categories","UW Financials","Last Refresh","FactInsurance","DimDeals","FactTax","FactCovenants","FactCriticalDates","Projections Advance & Payoff","Escrow Balance","Mortage Statement","Deal Overview","Collateral","Leverage","Valuations"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table 'Deal Financials'
+ref table DateTableTemplate_cb037a33-4358-4659-a1fe-504c8e9105b6
+ref table DimDate
+ref table 'Report Layout'
+ref table TotalMeasures
+ref table 'View Mode'
+ref table 'UID - Categories'
+ref table 'UW Financials'
+ref table LocalDateTable_b969a202-bf29-4ea1-b592-976d1bf3b9be
+ref table DimCategory
+ref table U_Measures
+ref table 'Last Refresh'
+ref table LocalDateTable_cc0517ef-5225-427a-ba50-9f952cb02664
+ref table LocalDateTable_f81bd40f-89d9-400b-af34-e5b7f165ce89
+ref table 'Granularity X'
+ref table 'Chart Filter Items'
+ref table 'Expenses Filter'
+ref table 'Revenue Filter'
+ref table FactInsurance
+ref table DimDeals
+ref table FactTax
+ref table FactCovenants
+ref table FactCriticalDates
+ref table 'Projections Advance & Payoff'
+ref table LocalDateTable_36df3da9-1ddb-47c9-850b-600a3059e471
+ref table LocalDateTable_b3b716de-3f33-4595-a671-2fe1cfdbfe88
+ref table 'Escrow Balance'
+ref table LocalDateTable_5767df04-4ab7-4c0b-ac61-290cd7d6f225
+ref table 'Mortage Statement'
+ref table LocalDateTable_8fcd4d27-5563-44cd-808e-0bd7ec3b18f2
+ref table LocalDateTable_0aee0d6e-1c35-4f7e-8638-1eedf6fa3193
+ref table LocalDateTable_9f9463c1-70ce-468d-8fb5-45f0e066c49b
+ref table LocalDateTable_709a3409-581c-4e54-8bac-cbabc865291d
+ref table LocalDateTable_177dd2f5-cce6-4b31-8e05-01027d71cf9f
+ref table 'Deal Overview'
+ref table LocalDateTable_db4bb562-5fee-4ae2-ba0e-8c60043f5ce7
+ref table LocalDateTable_022073a8-2907-4e42-9812-6dda6e92da86
+ref table LocalDateTable_3e87b48e-f66c-47a0-bf94-813bd836b97c
+ref table LocalDateTable_0393b1d2-144d-42cc-af7f-c66ac2886569
+ref table Collateral
+ref table 'Deal Overview Layout'
+ref table Leverage
+ref table 'Leverage Labels'
+ref table Valuations
+ref table 'Valuation Labels'
+ref table 'AssetType Table'
+ref table 'Loan Details Layout'
+ref table 'Return Metrics Layout'
+ref table LocalDateTable_2f17c6b3-1a47-47d7-a22c-475396d21380
+ref table LocalDateTable_9614716c-3c4f-47c7-bb5b-b06eb51be260
+ref table 'Internal Valuation Labels'
+ref table 'External Valuation Labels'
+
+ref cultureInfo es-MX
+

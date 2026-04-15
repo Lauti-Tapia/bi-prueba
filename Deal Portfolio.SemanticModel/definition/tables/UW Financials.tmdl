@@ -1,0 +1,325 @@
+table 'UW Financials'
+	isHidden
+	lineageTag: 71dd610f-632a-46b1-a8bf-df4196285534
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 238cdf10-515f-4dfb-8b08-6e775c90b737
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variación
+			isDefault
+			relationship: a3a11928-4f9f-4477-bd6a-7b8aee984ece
+			defaultHierarchy: LocalDateTable_b969a202-bf29-4ea1-b592-976d1bf3b9be.'Jerarquía de fechas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column cr83c_name
+		dataType: string
+		isHidden
+		lineageTag: aff7917d-1178-4361-a362-ad3c9c4bf519
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column cr83c_dealnumber
+		dataType: string
+		isHidden
+		lineageTag: 355ca747-be29-446d-85b7-bff4d1cc84c1
+		summarizeBy: none
+		sourceColumn: cr83c_dealnumber
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Property Size'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4266e3a5-6037-4428-88d6-f6f39b9ef8da
+		summarizeBy: sum
+		sourceColumn: Property Size
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 6c3efed7-db15-4480-8d05-e39ef2c85326
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Account Category'
+		dataType: string
+		isHidden
+		lineageTag: 884d987c-6b57-40dc-b866-d8dbca0f34cc
+		summarizeBy: none
+		sourceColumn: Account Category
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-Category
+		dataType: string
+		isHidden
+		lineageTag: c5c02166-49fc-4fc6-9193-a22d744ba187
+		summarizeBy: none
+		sourceColumn: Sub-Category
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Internal Line Item'
+		dataType: string
+		isHidden
+		lineageTag: 9e76c0e1-1cf2-46be-8d58-d9ac8f420e1e
+		summarizeBy: none
+		sourceColumn: Internal Line Item
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comments
+		dataType: string
+		isHidden
+		lineageTag: 1b09a160-b842-4b20-afde-bd601cde2895
+		summarizeBy: none
+		sourceColumn: Comments
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loan Amount'
+		dataType: decimal
+		isHidden
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: e0616f8e-91b4-4973-8ae4-a207fc17fd00
+		summarizeBy: sum
+		sourceColumn: Loan Amount
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Category
+		dataType: string
+		isHidden
+		lineageTag: a8fd17f3-9dcb-4161-aa51-104b06ce40fa
+		summarizeBy: none
+		sourceColumn: Category
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'UW Financials' = m
+		mode: import
+		source = ```
+				let
+				
+				
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				
+				    dbo_cr83c_assetmanagement = Origen{[Schema="dbo",Item="cr83c_assetmanagement"]}[Data],
+				
+				    dbo_cr83c_loancollateral = Origen{[Schema="dbo",Item="cr83c_loancollateral"]}[Data],
+				 
+				    #"Filas filtradas" = Table.SelectRows(dbo_cr83c_assetmanagement, each ([cr83c_isactive] = true)),
+				 
+				
+				    #"Consultas combinadas" = Table.NestedJoin(
+				
+				        #"Filas filtradas", {"cr83c_loancollateral"}, 
+				
+				        dbo_cr83c_loancollateral, {"cr83c_loancollateralid"}, 
+				
+				        "LoanCollateral_Record", 
+				
+				        JoinKind.LeftOuter
+				
+				    ),
+				 
+				    #"Expandir LoanCollateral" = Table.ExpandTableColumn(
+				
+				        #"Consultas combinadas", "LoanCollateral_Record", 
+				
+				        {"cr83c_propertysize"}, {"Property Size"}
+				
+				    ),
+				 
+				
+				
+				    #"Se expandió cr83c_underwritingfinancials" = Table.ExpandTableColumn(#"Expandir LoanCollateral", "cr83c_underwritingfinancials",
+				
+				        {
+				
+				            "cr83c_date", "cr83c_amount", 
+				
+				            "cr83c_accountcategoryname", "cr83c_accountcategory", 
+				
+				            "cr83c_accountsubcategoryname", "cr83c_accountsubcategory", 
+				
+				            "cr83c_comments", "cr83c_internallineitemname"
+				
+				        },
+				
+				        {
+				
+				            "Date", "Amount", 
+				
+				            "Account Category Name", "Account Category ID", 
+				
+				            "Sub-Category Name", "Sub-Category ID", 
+				
+				            "Comments", "Internal Line Item"
+				
+				        }
+				
+				    ),
+				 
+				    
+				
+				    #"Normalizar IDs" = Table.TransformColumns(#"Se expandió cr83c_underwritingfinancials",{
+				
+				        {"Account Category ID", each try Text.Lower(Text.From(_)) otherwise null, type text}, 
+				
+				        {"Sub-Category ID", each try Text.Lower(Text.From(_)) otherwise null, type text}
+				
+				    }),
+				 
+				 
+				
+				    DiccionarioDedup = Table.Distinct(#"UID - Categories", {"Internal Line Item"}),
+				 
+				
+				
+				    #"Join con Diccionario" = Table.NestedJoin(
+				
+				        #"Normalizar IDs", {"Internal Line Item"}, 
+				
+				        DiccionarioDedup, {"Internal Line Item"}, 
+				
+				        "Diccionario_Record", 
+				
+				        JoinKind.LeftOuter
+				
+				    ),
+				 
+				
+				
+				    #"Expandir Diccionario" = Table.ExpandTableColumn(#"Join con Diccionario", "Diccionario_Record", 
+				
+				        {"Account Category", "Sub-Category"}, 
+				
+				        {"M_AcName", "M_ScName"} 
+				
+				    ),
+				 
+				
+				    #"Logica Correccion" = Table.AddColumn(#"Expandir Diccionario", "FixedData", each 
+				
+				        let
+				
+				            AcID = [#"Account Category ID"],
+				
+				            ScID = [#"Sub-Category ID"],
+				
+				            OrigAC = [#"Account Category Name"],
+				
+				            OrigSC = [#"Sub-Category Name"],
+				
+				            RescueAC = [M_AcName],
+				
+				            RescueSC = [M_ScName]
+				
+				        in
+				
+				        
+				
+				            if ScID = "591900014" and AcID = "591900007" then [AC="Below the line", SC="CapEx Reserve"]
+				
+				            else if ScID = "591900017" and AcID = "591900000" then [AC=if OrigAC=null then RescueAC else OrigAC, SC="Other Income"]
+				
+				            else if ScID = "591900015" and AcID = "591900001" then [AC=if OrigAC=null then RescueAC else OrigAC, SC="HOA"]
+				
+				            else if ScID = "591900016" and AcID = "591900002" then [AC=if OrigAC=null then RescueAC else OrigAC, SC="Ground Lease"]
+				
+				         
+				
+				            else [
+				
+				                AC = if OrigAC <> null then OrigAC else if RescueAC <> null then RescueAC else "Unassigned",
+				
+				                SC = if OrigSC <> null then OrigSC else if RescueSC <> null then RescueSC else "Unassigned"
+				
+				            ]
+				
+				    ),
+				 
+				    #"Expandir Corregidos" = Table.ExpandRecordColumn(#"Logica Correccion", "FixedData", {"AC", "SC"}, {"Account Category", "Sub-Category"}),
+				 
+				   
+				
+				    #"Columnas Seleccionadas" = Table.SelectColumns(#"Expandir Corregidos",
+				
+				        {"Date", "cr83c_name", "cr83c_dealnumber", "Property Size", "Amount", "Account Category", "Sub-Category", "Internal Line Item", "Comments", "cr83c_originalcommitment"}
+				
+				    ),
+				 
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas Seleccionadas",{{"cr83c_originalcommitment", "Loan Amount"}}),
+				 
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{
+				
+				        {"Date", type date}, 
+				
+				        {"Amount", Currency.Type}, 
+				
+				        {"Property Size", Int64.Type},
+				
+				        {"Loan Amount", Currency.Type},
+				
+				        {"Account Category", type text},
+				
+				        {"Sub-Category", type text}
+				
+				    }),
+				 
+				    #"Agregar Category" = Table.AddColumn(#"Tipo cambiado", "Category", each "UW", type text)
+				
+				in
+				
+				    #"Agregar Category"
+				```
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,55 @@
+table 'Leverage Labels'
+	lineageTag: bac00e9b-2e04-4f73-9e53-8f31c08f76f2
+
+	measure 'Leverage Value' = ```
+			
+			  SWITCH(
+			      SELECTEDVALUE('Leverage Labels'[ ]),
+			      "Provider", SELECTEDVALUE('Leverage'[Provider], "-"),
+			      "Max Amount", FORMAT(SELECTEDVALUE('Leverage'[Max Amount], 0), "$#,##0"),
+			      "Max Leverage", FORMAT(SELECTEDVALUE('Leverage'[Max Leverage], 0), "0%"),
+			      "Leverage Drawn", FORMAT(SELECTEDVALUE('Leverage'[Leverage Drawn], 0), "$#,##0"),
+			      "Leverage Ratio", FORMAT(SELECTEDVALUE('Leverage'[Leverage Ratio], 0), "0%"),
+			      "Note Rate", FORMAT(SELECTEDVALUE('Leverage'[Note Rate], 0), "0.0%"),
+			      "-"
+			  )
+			```
+		lineageTag: 776f041e-fc79-412a-80d9-aad32d64e64f
+
+	column Sort
+		formatString: 0
+		lineageTag: a24398c2-46fb-423e-86b0-8d3a25f8685a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' '
+		lineageTag: 5a8ac345-5ecf-4e6e-8809-fbf04980e0e5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Leverage Labels' = calculated
+		mode: import
+		source = ```
+				
+				  DATATABLE(
+				      " ", STRING,
+				      "Sort", INTEGER,
+				      {
+				          {"Provider", 1},
+				          {"Max Amount", 2},
+				          {"Max Leverage", 3},
+				          {"Leverage Drawn", 4},
+				          {"Leverage Ratio", 5},
+				          {"Note Rate", 6}
+				      }
+				  )
+				```
+
+	annotation PBI_Id = 3b57339104ee40928bd70b38116a09bd
+

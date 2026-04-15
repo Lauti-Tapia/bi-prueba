@@ -1,0 +1,37 @@
+table 'Last Refresh'
+	lineageTag: 8bba0597-3aa9-4815-9df6-e6075bbc722f
+
+	measure 'Last refresh' =
+			
+			"Last Refresh: "
+			& FORMAT ( MAX ( 'Last Refresh'[LastRefresh_EST] ), "MM/dd/yyyy" )
+		lineageTag: 3942a9d4-f676-451a-b946-bb3a26d6e3b0
+
+	column LastRefresh_EST
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 270d7a98-3fa4-4b3b-8c8b-680b03085093
+		summarizeBy: none
+		sourceColumn: LastRefresh_EST
+
+		variation Variación
+			isDefault
+			relationship: 5ab1b9be-24fe-4c5f-98c7-55fb2bc2ea47
+			defaultHierarchy: LocalDateTable_cc0517ef-5225-427a-ba50-9f952cb02664.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Last Refresh' = m
+		mode: import
+		source =
+				let
+				    NowUTC = DateTimeZone.UtcNow(),
+				    EST = DateTimeZone.SwitchZone(NowUTC, -5),
+				    AsTable = #table(type table [LastRefresh_EST = datetimezone], {{EST}})
+				in
+				    AsTable
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

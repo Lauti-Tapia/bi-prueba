@@ -1,0 +1,49 @@
+table 'Granularity X'
+	lineageTag: ba47af65-a460-4dfd-9022-e3373a4cc618
+
+	column 'Granularity X'
+		lineageTag: f7b94426-a158-414d-b9bf-ccbe5aded25a
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Granularity X Orden'
+
+		relatedColumnDetails
+			groupByColumn: 'Granularity X Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Granularity X Campos'
+		isHidden
+		lineageTag: c18d2a82-925b-4ae5-821d-fcb418cee0b7
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Granularity X Orden'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Granularity X Orden'
+		isHidden
+		formatString: 0
+		lineageTag: 1b869c8a-ddfc-4d67-b3b3-6120b40f18fc
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Granularity X' = calculated
+		mode: import
+		source =
+				{
+				    ("Annualy", NAMEOF('DimDate'[Year]), 0),
+				    ("Quarterly", NAMEOF('DimDate'[Year-Quarter]), 1),
+				    ("Monthly", NAMEOF('DimDate'[Year-Month]), 2)
+				}
+
+	annotation PBI_Id = b67d37e3fc1a419ca4cdce6a84ab1d83
+

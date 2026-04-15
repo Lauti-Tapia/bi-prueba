@@ -1,0 +1,149 @@
+relationship a3a11928-4f9f-4477-bd6a-7b8aee984ece
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'UW Financials'.Date
+	toColumn: LocalDateTable_b969a202-bf29-4ea1-b592-976d1bf3b9be.Date
+
+relationship 5ab1b9be-24fe-4c5f-98c7-55fb2bc2ea47
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Last Refresh'.LastRefresh_EST
+	toColumn: LocalDateTable_cc0517ef-5225-427a-ba50-9f952cb02664.Date
+
+relationship b558503c-f2be-abfc-948e-7ed648b5eb25
+	fromColumn: 'Deal Financials'.Category
+	toColumn: DimCategory.Category
+
+relationship 7578fa83-c173-4e7e-adac-b642e4fa09a1
+	joinOnDateBehavior: datePartOnly
+	fromColumn: DimDate.Date
+	toColumn: LocalDateTable_f81bd40f-89d9-400b-af34-e5b7f165ce89.Date
+
+relationship cd9d8a9e-f396-2a7b-e632-03b0acbfc6ce
+	fromColumn: 'Deal Financials'.Date
+	toColumn: DimDate.Date
+
+relationship AutoDetected_f4218a85-a819-42f3-8af7-a7220f76682f
+	fromColumn: 'Deal Financials'.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship AutoDetected_3d17a594-c04b-4548-b56d-29b362220720
+	fromColumn: FactInsurance.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship AutoDetected_5387fc83-52e9-462d-96cb-f7f383f2a2f8
+	fromColumn: FactTax.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship AutoDetected_62b8ade9-f4dd-40c0-8c89-b687d599598c
+	fromColumn: FactCovenants.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship AutoDetected_59eb914a-d786-450a-8059-58c11328e038
+	fromColumn: FactCriticalDates.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship 8a47b786-1a72-4991-94d2-cb1e40de13f3
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Projections Advance & Payoff'.'Projected Date'
+	toColumn: LocalDateTable_36df3da9-1ddb-47c9-850b-600a3059e471.Date
+
+relationship 2da93e51-0ce3-4771-a1df-8b27c7569195
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Projections Advance & Payoff'.'Actual Date'
+	toColumn: LocalDateTable_b3b716de-3f33-4595-a671-2fe1cfdbfe88.Date
+
+relationship AutoDetected_be1447f2-e3f0-41d6-8dca-87a924bd87fe
+	fromColumn: 'Projections Advance & Payoff'.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship 74c8d50b-a603-4945-b051-57cb148977e5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Escrow Balance'.'Latest Date'
+	toColumn: LocalDateTable_5767df04-4ab7-4c0b-ac61-290cd7d6f225.Date
+
+relationship AutoDetected_deda03d6-dff0-4f8d-9d25-6a2d0d72d676
+	fromColumn: 'Escrow Balance'.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship AutoDetected_a9208f6b-ff30-463b-b471-ae586af26e7c
+	fromColumn: 'Mortage Statement'.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship 9f7c5b6b-d122-4e1a-af29-0a6e44f12eae
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Mortage Statement'.Date
+	toColumn: LocalDateTable_8fcd4d27-5563-44cd-808e-0bd7ec3b18f2.Date
+
+relationship fa9ae2af-0eb9-40e5-82ac-fd62544b5979
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FactInsurance.'Expiration Date'
+	toColumn: LocalDateTable_0aee0d6e-1c35-4f7e-8638-1eedf6fa3193.Date
+
+relationship 4f36e00c-bb80-4e8e-92f1-d72f50fae3d2
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FactTax.'Next Payment Due'
+	toColumn: LocalDateTable_9f9463c1-70ce-468d-8fb5-45f0e066c49b.Date
+
+relationship 976e9d51-016b-4e34-9ef6-e19180d4991c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FactCovenants.'Action Date'
+	toColumn: LocalDateTable_709a3409-581c-4e54-8bac-cbabc865291d.Date
+
+relationship f3e1591b-b94c-4cf0-80fa-e60c65491e0a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FactCriticalDates.'Due Date'
+	toColumn: LocalDateTable_177dd2f5-cce6-4b31-8e05-01027d71cf9f.Date
+
+relationship 5cc962ad-d494-4400-a6c5-8f7b336d04ca
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Deal Overview'.'Original Maturity Date'
+	toColumn: LocalDateTable_db4bb562-5fee-4ae2-ba0e-8c60043f5ce7.Date
+
+relationship 69998e49-6aa3-413c-8477-c0b70b9d0c42
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Deal Overview'.'Maturity Date'
+	toColumn: LocalDateTable_022073a8-2907-4e42-9812-6dda6e92da86.Date
+
+relationship AutoDetected_b70c0f17-b910-4146-9143-f220765c9902
+	fromColumn: 'UW Financials'.cr83c_name
+	toColumn: 'Deal Overview'.'Deal name'
+
+relationship 2d410c20-bb29-7ee6-5ce5-703554e0dc2f
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: DimDeals.'Deal name'
+	toColumn: 'Deal Overview'.'Deal name'
+
+relationship c75ea551-b3f9-495b-8888-cacece5cbe43
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Deal Overview'.'Cap Table Maturity Date'
+	toColumn: LocalDateTable_3e87b48e-f66c-47a0-bf94-813bd836b97c.Date
+
+relationship 624cfcb3-a7d8-4222-a28f-10eedc35cc99
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Deal Overview'.'Closing Date'
+	toColumn: LocalDateTable_0393b1d2-144d-42cc-af7f-c66ac2886569.Date
+
+relationship 291a5482-fc0d-ec19-591c-d6287f2d0add
+	fromColumn: Collateral.Name
+	toColumn: DimDeals.'Deal name'
+
+relationship AutoDetected_f9db4c3f-273c-4fa5-ba2c-0ea0cea6b2d0
+	fromColumn: Leverage.'Deal Name'
+	toColumn: DimDeals.'Deal name'
+
+relationship AutoDetected_6a922ee2-03c3-48b8-b186-4fa58710a227
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Valuations.'Deal name'
+	toColumn: DimDeals.'Deal name'
+
+relationship d8644530-a548-4525-ad65-616592129f6a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Valuations.'Valuation Date'
+	toColumn: LocalDateTable_2f17c6b3-1a47-47d7-a22c-475396d21380.Date
+
+relationship cf612726-51d7-4036-b8f0-a88e7fa4c806
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Valuations.'Internal Valuation Date'
+	toColumn: LocalDateTable_9614716c-3c4f-47c7-bb5b-b06eb51be260.Date
+

@@ -1,0 +1,184 @@
+table FactCriticalDates
+	lineageTag: 9219fda4-75fa-45a1-961c-f33c8a2987d1
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: 49272e82-bbf1-4235-9278-8e8e423b98f6
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: ee10bd35-5db1-4b27-9b25-5103928a41b2
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 9901cabc-6abd-41ed-8f12-ddb3c3631d7c
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 3ad96ccb-3055-4988-ba5f-7fa7b745976e
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		dataType: int64
+		formatString: 0
+		lineageTag: 63aa10a7-599e-41d5-8fdb-5293814d6fa8
+		summarizeBy: sum
+		sourceColumn: Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Status Code Name'
+		dataType: string
+		lineageTag: 30ac548a-736a-4430-a925-06854ae828be
+		summarizeBy: none
+		sourceColumn: Status Code Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Due Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f520066d-0260-4b61-aee0-ec3837d1383a
+		summarizeBy: none
+		sourceColumn: Due Date
+
+		variation Variación
+			isDefault
+			relationship: f3e1591b-b94c-4cf0-80fa-e60c65491e0a
+			defaultHierarchy: LocalDateTable_177dd2f5-cce6-4b31-8e05-01027d71cf9f.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Asset Management Name'
+		dataType: string
+		lineageTag: d7150503-eb42-4e95-af25-38adf43a18b4
+		summarizeBy: none
+		sourceColumn: Asset Management Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Critical Date Description'
+		dataType: string
+		lineageTag: 565f429a-7d20-4d2a-b27f-9d318d0d0f3e
+		summarizeBy: none
+		sourceColumn: Critical Date Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Covenant Title'
+		dataType: string
+		lineageTag: 80fe1663-8916-4b43-8a5e-b8649713ceca
+		summarizeBy: none
+		sourceColumn: Covenant Title
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Description New'
+		dataType: string
+		lineageTag: a524dc89-f693-408f-ad4e-2ac7f9db58eb
+		summarizeBy: none
+		sourceColumn: Description New
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Urgency Bucket' = ```
+			
+			
+			VAR DaysRemaining = DATEDIFF(TODAY(), 'FactCriticalDates'[Due Date], DAY)
+			
+			RETURN
+			
+			    SWITCH(
+			
+			        TRUE(),
+			
+			        ISBLANK('FactCriticalDates'[Due Date]), BLANK(),
+			
+			        DaysRemaining < 0, "Past Due",
+			
+			        DaysRemaining <= 15, "15 Days",
+			
+			        DaysRemaining <= 30, "30 Days",
+			
+			        DaysRemaining <= 60, "60 Days",
+			
+			        DaysRemaining <= 90, "90 Days",
+			
+			        BLANK()
+			
+			    )
+			 
+			```
+		lineageTag: c1248030-c338-4287-97e4-711d75bf92f8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactCriticalDates = m
+		mode: import
+		source =
+				let
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				    AssetMgmt = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				    DealsActivos = Table.SelectRows(
+				        AssetMgmt,
+				        each [cr83c_name] <> null
+				            and ([cr83c_dealstatusname] = "(1) SPECIAL SERVICING"
+				                or [cr83c_dealstatusname] = "(2) WATCHLIST"
+				                or [cr83c_dealstatusname] = "(3) PERFORMING")
+				    ),
+				    Columnas = Table.SelectColumns(DealsActivos, {
+				        "cr83c_name",
+				        "cr83c_dealcriticaldates"
+				    }),
+				    Expand = Table.ExpandTableColumn(
+				        Columnas,
+				        "cr83c_dealcriticaldates",
+				        {"statuscodename", "cr83c_description", "cr83c_duedate", "cr83c_statusname", "cr83c_categoryname", "cr83c_assetmanagementname", "cr83c_criticaldatedescription", "cr83c_covenanttitle", "cr83c_type", "cr83c_descriptionnew"},
+				        {"Status Code Name", "Description", "Due Date", "Status", "Category", "Asset Management Name", "Critical Date Description", "Covenant Title", "Type", "Description New"}
+				    ),
+				    LimpiarHTML = Table.TransformColumns(Expand, {
+				        {"Description New", each
+				            if _ = null then null
+				            else
+				                let
+				                    SinTags = Text.Combine(
+				                        List.Transform(
+				                            Text.Split(_, "<"),
+				                            each if Text.Contains(_, ">")
+				                                 then Text.AfterDelimiter(_, ">")
+				                                 else _
+				                        )
+				                    ),
+				                    Limpio = Text.Trim(Text.Clean(SinTags))
+				                in
+				                    Limpio,
+				            type text
+				        }
+				    }),
+				    SoloActivos = Table.SelectRows(LimpiarHTML, each ([Status Code Name] = "Active") and ([Status] <> "Complete")),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(SoloActivos,{{"Due Date", type date}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

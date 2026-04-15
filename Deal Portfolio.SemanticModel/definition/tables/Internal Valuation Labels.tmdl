@@ -1,0 +1,53 @@
+table 'Internal Valuation Labels'
+	lineageTag: 2306163a-fcab-45a6-8b00-d29acf320de4
+
+	measure 'Internal Valuation Value' = ```
+			
+			  SWITCH(                   
+			      SELECTEDVALUE('Internal Valuation Labels'[ ]),
+			      "As Is Valuation", FORMAT(SELECTEDVALUE('Valuations'[As Is Valuation (Internal)], 0), "$#,##0"),
+			      "LTV - As Is", FORMAT(SELECTEDVALUE('Valuations'[LTV - As Is (Internal)], 0) / 100, "0.0%"),    
+			      "As Stable Valuation", FORMAT(SELECTEDVALUE('Valuations'[As Stable Valuation (Internal)], 0), "$#,##0"),                                                                                "LTV - As Stable", FORMAT(SELECTEDVALUE('Valuations'[LTV - As Stable (Internal)], 0) / 100, "0.0%"),    
+			      "-"                                                                                                                                                                               
+			  ) 
+			```
+		lineageTag: 78f53569-b2d0-4af7-972e-3521f34c769f
+
+	measure 'Internal Valuation Date' = FORMAT(SELECTEDVALUE('Valuations'[Internal Valuation Date]), "MM/DD/YYYY")
+		lineageTag: f6100291-53d3-4e4e-91d1-1bec48182714
+
+	column ' '
+		lineageTag: 659b461a-a85d-496d-bc12-9dfce65221e1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+		sortByColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		formatString: 0
+		lineageTag: 086ff01d-56b7-48a6-a7e5-3e55a66c54cf
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Internal Valuation Labels' = calculated
+		mode: import
+		source = ```
+				
+				  DATATABLE(
+				      " ", STRING,
+				      "Sort", INTEGER,
+				      {               
+				          {"As Is Valuation", 1},                                                                                                                                                                 {"LTV - As Is", 2},    
+				          {"As Stable Valuation", 3},                                                                                                                                                   
+				          {"LTV - As Stable", 4}     
+				      }
+				  )
+				```
+
+	annotation PBI_Id = 634981cd82a542729565302b30229b8c
+

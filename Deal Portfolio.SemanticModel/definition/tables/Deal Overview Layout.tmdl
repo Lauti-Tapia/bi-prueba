@@ -1,0 +1,79 @@
+table 'Deal Overview Layout'
+	lineageTag: 303bf2a5-f6bc-461f-8089-3340c0451a47
+
+	measure 'Deal Overview Value' = ```
+			
+			  VAR _Metric = SELECTEDVALUE('Deal Overview Layout'[ ])
+			  RETURN
+			  SWITCH(
+			      _Metric,
+			      "Current Principal Balance", FORMAT(SUM('Deal Overview'[Current Principal Balance]), "$#,0"),
+			      "Initial Advance", FORMAT(SUM('Deal Overview'[Initial Advance ]), "$#,0"),
+			      "Commitment", FORMAT(SUM('Deal Overview'[Original Commitment]), "$#,0"),
+			      "Target Gross IRR (%)", FORMAT(SUM('Deal Overview'[Target Gross IRR (%)]), "0.00") & "%",
+			      "Target Gross Cash Multiple", FORMAT(SUM('Deal Overview'[Target Gross Cash Multiple]), "0.00") & "x",
+			      "Target Levered IRR (%)", FORMAT(SUM('Deal Overview'[Target Levered IRR (%)]), "0.00") & "%",
+			      "Target Levered Cash Multiple", FORMAT(SUM('Deal Overview'[Target Levered Cash Multiple]), "0.00") & "x",
+			      "Loan Type", SELECTEDVALUE('Deal Overview'[Loan Type 2]),
+			      "Note Rate (Floor)", SELECTEDVALUE('Deal Overview'[Note Rate (Floor)]),
+			      "Term", SELECTEDVALUE('Deal Overview'[Term]),
+			      "Extension Options", SELECTEDVALUE('Deal Overview'[Extension Options]),
+			      "Asset Type", SELECTEDVALUE('Deal Overview'[Asset Type Primary]),
+			      "Property Size", FORMAT(SUM(Collateral[Property Size]), "#,0"),
+			      "Guaranty", SELECTEDVALUE('Deal Overview'[Guaranty]),
+			      BLANK()
+			  )
+			```
+		lineageTag: 7fc126ec-7b50-4f96-a866-2cd835864788
+
+	column SortOrder
+		formatString: 0
+		lineageTag: 7d285c8a-ac42-4259-86c8-af2914ba02ab
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Section
+		lineageTag: 5db0817e-4ef4-406e-8c0d-a59e488433c4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Section]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' '
+		lineageTag: c43e10d4-94d3-4308-b943-eddd0f9fa0e9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Deal Overview Layout' = calculated
+		mode: import
+		source = ```
+				DATATABLE(
+				      "SortOrder", INTEGER,                                                                                                                            
+				      "Section", STRING,                                                                                                                               
+				      " ", STRING,
+				      {
+				          {4,  "Financial Metrics", "Target Gross IRR (%)"},
+				          {5,  "Financial Metrics", "Target Gross Cash Multiple"},
+				          {6,  "Financial Metrics", "Target Levered IRR (%)"},
+				          {7,  "Financial Metrics", "Target Levered Cash Multiple"},
+				          {8,  "Deal Structure",    "Loan Type"},
+				          {9,  "Deal Structure",    "Note Rate (Floor)"},
+				          {10, "Deal Structure",    "Term"},
+				          {11, "Deal Structure",    "Extension Options"},
+				          {12, "Deal Structure",    "Asset Type"},
+				          {13, "Deal Structure",    "Property Size"},
+				          {14, "Deal Structure",    "Guaranty"}
+				      }
+				  )
+				```
+
+	annotation PBI_Id = ae935c4cd8e94268ac576460a1d7257e
+

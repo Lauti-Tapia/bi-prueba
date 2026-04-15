@@ -1,0 +1,112 @@
+table FactTax
+	lineageTag: c6da1252-b57b-4233-a005-2de5f1944749
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: 596c22b5-8a32-4f2d-9663-a612959d2ff0
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 02ee2417-d44d-4956-b963-7e566a2a5588
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 7f58dfdf-b2fe-4325-aa3a-6daf515d7dce
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Status Code Name'
+		dataType: string
+		lineageTag: 31c8d98d-e56c-4b58-828a-e103687114f4
+		summarizeBy: none
+		sourceColumn: Status Code Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parcel ID'
+		dataType: string
+		lineageTag: 0bccf7d9-a772-4271-b2ba-af880786d882
+		summarizeBy: none
+		sourceColumn: Parcel ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tax Authority'
+		dataType: string
+		lineageTag: 384b0452-7eaa-4e31-a89e-4881375de01b
+		summarizeBy: none
+		sourceColumn: Tax Authority
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tax Due Date'
+		dataType: string
+		lineageTag: 6a2e4985-fd07-4845-abb4-1d4bcd990347
+		summarizeBy: none
+		sourceColumn: Tax Due Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Next Payment Due'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: d73779ad-ed53-4da7-b37f-54e1118099aa
+		summarizeBy: none
+		sourceColumn: Next Payment Due
+
+		variation Variación
+			isDefault
+			relationship: 4f36e00c-bb80-4e8e-92f1-d72f50fae3d2
+			defaultHierarchy: LocalDateTable_9f9463c1-70ce-468d-8fb5-45f0e066c49b.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asset Management Name'
+		dataType: string
+		lineageTag: ee5e66aa-0e4f-4a0e-a570-ce9999f58177
+		summarizeBy: none
+		sourceColumn: Asset Management Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactTax = m
+		mode: import
+		source =
+				let
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				    AssetMgmt = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				    DealsActivos = Table.SelectRows(
+				        AssetMgmt,
+				        each [cr83c_name] <> null
+				            and ([cr83c_dealstatusname] = "(1) SPECIAL SERVICING"
+				                or [cr83c_dealstatusname] = "(2) WATCHLIST"
+				                or [cr83c_dealstatusname] = "(3) PERFORMING")
+				    ),
+				    Columnas = Table.SelectColumns(DealsActivos, {
+				        "cr83c_name",
+				        "cr83c_loantaxdetails"
+				    }),
+				    Expand = Table.ExpandTableColumn(
+				        Columnas,
+				        "cr83c_loantaxdetails",
+				        {"statuscodename", "cr83c_parcelid", "cr83c_taxauthorityname", "cr83c_taxduedate", "cr83c_nextpaymentdue", "cr83c_assetmanagementname", "cr83c_cityname", "cr83c_statesname"},
+				        {"Status Code Name", "Parcel ID", "Tax Authority", "Tax Due Date", "Next Payment Due", "Asset Management Name", "City", "State"}
+				    ),
+				    SoloActivos = Table.SelectRows(Expand, each [Status Code Name] = "Active")
+				in
+				    SoloActivos
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

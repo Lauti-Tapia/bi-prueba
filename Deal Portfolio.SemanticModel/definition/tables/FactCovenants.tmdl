@@ -1,0 +1,165 @@
+table FactCovenants
+	lineageTag: 58dda19e-6794-4969-acce-ab13e7b4e96a
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: efab2fc9-d924-46a3-a2f1-2b5cadd633e9
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Title
+		dataType: string
+		lineageTag: 813181ab-b909-4f38-aa72-bce5aee8ddad
+		summarizeBy: none
+		sourceColumn: Title
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 2c1a3e66-53ef-46b3-a328-17bb6c21c438
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		dataType: string
+		lineageTag: c6506da1-c244-4b2a-b2ab-e064c4f6086f
+		summarizeBy: none
+		sourceColumn: Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Importance
+		dataType: string
+		lineageTag: 66b7742f-b8a1-4985-848b-b2525b0cb9c1
+		summarizeBy: none
+		sourceColumn: Importance
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Status Code Name'
+		dataType: string
+		lineageTag: 9703cd26-05a3-483f-ab0b-6b2f53d2010b
+		summarizeBy: none
+		sourceColumn: Status Code Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'State Code'
+		dataType: int64
+		formatString: 0
+		lineageTag: ff86bb6c-1163-45d9-b5ef-8d419a8ab801
+		summarizeBy: count
+		sourceColumn: State Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Action Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: cf5c1dd0-2534-4e34-b347-35dec53917fd
+		summarizeBy: none
+		sourceColumn: Action Date
+
+		variation Variación
+			isDefault
+			relationship: 976e9d51-016b-4e34-9ef6-e19180d4991c
+			defaultHierarchy: LocalDateTable_709a3409-581c-4e54-8bac-cbabc865291d.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactCovenants = m
+		mode: import
+		source =
+				let
+				
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				
+				    AssetMgmt = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				
+				    DealsActivos = Table.SelectRows(
+				
+				        AssetMgmt,
+				
+				        each [cr83c_name] <> null
+				
+				            and ([cr83c_dealstatusname] = "(1) SPECIAL SERVICING"
+				
+				                or [cr83c_dealstatusname] = "(2) WATCHLIST"
+				
+				                or [cr83c_dealstatusname] = "(3) PERFORMING")
+				
+				    ),
+				
+				    Columnas = Table.SelectColumns(DealsActivos, {
+				
+				        "cr83c_name",
+				
+				        "cr83c_dealcovenants"
+				
+				    }),
+				
+				    Expand = Table.ExpandTableColumn(
+				
+				        Columnas,
+				
+				        "cr83c_dealcovenants",
+				
+				        {"statuscodename", "cr83c_covenanttitle", "cr83c_description", "cr83c_covenanttypename", "cr83c_importancename", "statecode", "cr83c_actiondate"},
+				
+				        {"Status Code Name", "Title", "Description", "Type", "Importance", "State Code", "Action Date"}
+				
+				    ),
+				
+				    LimpiarHTML = Table.TransformColumns(Expand, {
+				
+				        {"Description", each
+				
+				            if _ = null then null
+				
+				            else
+				
+				                let
+				
+				                    SinTags = Text.Combine(
+				
+				                        List.Transform(
+				
+				                            Text.Split(_, "<"),
+				
+				                            each if Text.Contains(_, ">")
+				
+				                                 then Text.AfterDelimiter(_, ">")
+				
+				                                 else _
+				
+				                        )
+				
+				                    ),
+				
+				                    Limpio = Text.Trim(Text.Clean(SinTags))
+				
+				                in
+				
+				                    Limpio,
+				
+				            type text
+				
+				        }
+				
+				    }),
+				
+				    SoloActivos = Table.SelectRows(LimpiarHTML, each [Status Code Name] = "Active")
+				
+				in
+				
+				    SoloActivos
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

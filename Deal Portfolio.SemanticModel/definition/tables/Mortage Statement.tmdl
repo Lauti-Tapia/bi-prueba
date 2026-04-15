@@ -1,0 +1,203 @@
+table 'Mortage Statement'
+	lineageTag: 5045fd71-7fc0-4c92-bad6-1fd2b61d53ad
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: d8ef1fdc-a452-4551-895b-fca27e714442
+		summarizeBy: none
+		sourceColumn: Deal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Principal Balance'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 8791a23a-33d0-44b5-b381-b18197b7944b
+		summarizeBy: sum
+		sourceColumn: Principal Balance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Total Credits'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 6c9d1fa0-e0c4-414b-a337-488845a90776
+		summarizeBy: sum
+		sourceColumn: Total Credits
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Past Due'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: d26bc522-b419-4104-855e-49faca8f5f71
+		summarizeBy: sum
+		sourceColumn: Past Due
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Current Interest'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 4c56635a-2c51-4c55-af89-1bdb0d101f50
+		summarizeBy: sum
+		sourceColumn: Current Interest
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Servicing Fee'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 422075d5-0b7e-467c-8d0c-a4f958edd227
+		summarizeBy: sum
+		sourceColumn: Servicing Fee
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Late Fee'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 976b3a30-9a55-4ce4-9e80-a591cada8526
+		summarizeBy: sum
+		sourceColumn: Late Fee
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: e8458f1e-1026-49cc-a3c7-fca197082919
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variación
+			isDefault
+			relationship: 9f7c5b6b-d122-4e1a-af29-0a6e44f12eae
+			defaultHierarchy: LocalDateTable_8fcd4d27-5563-44cd-808e-0bd7ec3b18f2.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Tax Escrow'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 63c3587e-318a-40fa-9a12-729baf47c669
+		summarizeBy: sum
+		sourceColumn: Tax Escrow
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Insurance Escrow'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 81bcf826-ecb3-449b-a7fe-5331892d1a4f
+		summarizeBy: sum
+		sourceColumn: Insurance Escrow
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Other Escrow'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 3c4a4d4e-b3e6-4292-b6b0-5134be1f7f26
+		summarizeBy: sum
+		sourceColumn: Other Escrow
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Misc Fee'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: aaa35157-df65-4e2f-baf5-78a5a6b8af3c
+		summarizeBy: sum
+		sourceColumn: Misc Fee
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Rate
+		dataType: double
+		lineageTag: 794aea96-2286-417a-9b35-714d59c7f3c0
+		summarizeBy: sum
+		sourceColumn: Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Days
+		dataType: int64
+		formatString: 0
+		lineageTag: eea74c8c-882f-4f87-986a-c4a140b77b20
+		summarizeBy: sum
+		sourceColumn: Days
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Mortage Statement' = m
+		mode: import
+		source = ```
+				let
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				    AssetMgmt = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				 
+				    StatusValidos = {"(1) SPECIAL SERVICING", "(2) WATCHLIST", "(3) PERFORMING"},
+				    DealsActivos = Table.SelectRows(
+				        AssetMgmt,
+				        each [cr83c_name] <> null
+				            and List.Contains(StatusValidos, [cr83c_dealstatusname])
+				    ),
+				 
+				    Columnas = Table.SelectColumns(DealsActivos, {"cr83c_name", "cr83c_ammonthlydebtservice"}),
+				    RenombrarDeal = Table.RenameColumns(Columnas, {{"cr83c_name", "Deal"}}),
+				 
+				    Expand = Table.ExpandTableColumn(
+				        RenombrarDeal,
+				        "cr83c_ammonthlydebtservice",
+				        {"cr83c_principalbalance", "cr83c_monthenddate", "cr83c_taxescrowdue",
+				         "cr83c_insuranceescrowdue", "cr83c_otherescrowdue", "cr83c_miscfeedue",
+				         "cr83c_currentrate", "cr83c_numberofrecordsinmonth", "cr83c_totalcredits",
+				         "cr83c_pastdue", "cr83c_currentinterestadjusted", "cr83c_servicingfeedueadjusted",
+				         "cr83c_latefeeadjusted"},
+				        {"Principal Balance", "Date", "Tax Escrow", "Insurance Escrow", "Other Escrow",
+				         "Misc Fee", "Rate", "Days", "Total Credits", "Past Due", "Current Interest",
+				         "Servicing Fee", "Late Fee"}
+				    ),
+				 
+				    TiposFecha = Table.TransformColumnTypes(Expand, {{"Date", type date}}),
+				 
+				    // === FILTRO: Todo el histórico hasta fin del mes actual ===
+				    Hoy = DateTime.Date(DateTime.LocalNow()),
+				    FinMesActual = Date.EndOfMonth(Hoy),
+				    Filtrado = Table.SelectRows(
+				        TiposFecha,
+				        each [Date] <> null and [Date] <= FinMesActual
+				    )
+				in
+				    Filtrado
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

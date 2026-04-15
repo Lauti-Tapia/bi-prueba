@@ -1,0 +1,461 @@
+table TotalMeasures
+	lineageTag: 67b0ba8f-f2c1-4f05-a47f-dbfbbece0d3c
+
+	measure $ = ```
+			
+			VAR CurrentItem = SELECTEDVALUE( 'Report Layout'[ ] )
+			VAR CurrentRowType = SELECTEDVALUE( 'Report Layout'[RowType] )
+			VAR _Revenue_Items =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Gross Potential Rent", "Loss to Lease" }
+			    )
+			VAR _Vacancy_Items =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Vacancy", "Concessions", "Bad Debt Loss" }
+			    )
+			VAR _Other_Income =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Utility Income", "Other Income" }
+			    )
+			VAR _Controllable_OpEx =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item]
+			            IN {
+			                "General & Administrative", "Payroll", "Sales & Marketing", "Utilities",
+			                "Repairs & Maintenance", "Management Fee", "Turnover"
+			            }
+			    )
+			VAR _Fixed_OpEx =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Property Taxes", "Insurance" }
+			    )
+			VAR _Below_NOI =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "CapEx Reserve", "Debt Service" }
+			    )
+			VAR _Adjusted_GPR = _Revenue_Items
+			VAR _Effective_Rental = _Adjusted_GPR + _Vacancy_Items
+			VAR _Effective_Gross_Rev = _Effective_Rental + _Other_Income
+			VAR _Total_OpEx = _Controllable_OpEx + _Fixed_OpEx
+			VAR _NOI = _Effective_Gross_Rev - _Total_OpEx
+			VAR _CashFlow = _NOI - _Below_NOI
+			VAR _Result =
+			    SWITCH(
+			        TRUE(),
+			        CurrentRowType = "Header", BLANK(),
+			        CurrentItem = "Adj. GPR", _Adjusted_GPR,
+			        CurrentItem = "Effective Rental Income", _Effective_Rental,
+			        CurrentItem = "Effective Gross Revenue", _Effective_Gross_Rev,
+			        CurrentItem = "Total Controllable Expenses", _Controllable_OpEx,
+			        CurrentItem = "Total Operating Expenses", _Total_OpEx,
+			        CurrentItem = "Net Operating Income", _NOI,
+			        CurrentItem = "Cash Flow from Operations", _CashFlow,
+			        CALCULATE(
+			            SUM( 'Deal Financials'[Amount] ),
+			            'Deal Financials'[Internal Line Item] = CurrentItem
+			        )
+			    )
+			RETURN
+			    _Result * [Annual Factor (Apply)]
+			
+			 
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 764ef0d1-bd10-433a-a6f0-ff104c6e879c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure Test_Debug = ```
+			COUNTROWS('Deal Financials')
+			 
+			```
+		formatString: 0
+		isHidden
+		lineageTag: 16037ab5-2344-4db0-ac39-6877b21ed9e2
+
+	measure $/unit = ```
+			
+			VAR CurrentItem = SELECTEDVALUE( 'Report Layout'[ ] )
+			VAR CurrentRowType = SELECTEDVALUE( 'Report Layout'[RowType] )
+			VAR _Units = MAX( 'Deal Financials'[Property Size] )
+			VAR _Revenue_Items = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Gross Potential Rent", "Loss to Lease" } )
+			VAR _Vacancy_Items = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Vacancy", "Concessions", "Bad Debt Loss" } )
+			VAR _Other_Income = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Utility Income", "Other Income" } )
+			VAR _Controllable_OpEx = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "General & Administrative", "Payroll", "Sales & Marketing", "Utilities", "Repairs & Maintenance", "Management Fee", "Turnover" } )
+			VAR _Fixed_OpEx = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Property Taxes", "Insurance" } )
+			VAR _Below_NOI = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "CapEx Reserve", "Debt Service" } )
+			VAR _Adjusted_GPR = _Revenue_Items
+			VAR _Effective_Rental = _Adjusted_GPR + _Vacancy_Items
+			VAR _Effective_Gross_Rev = _Effective_Rental + _Other_Income
+			VAR _Total_OpEx = _Controllable_OpEx + _Fixed_OpEx
+			VAR _NOI = _Effective_Gross_Rev - _Total_OpEx
+			VAR _CashFlow = _NOI - _Below_NOI
+			VAR _Numerator = 
+			    SWITCH( TRUE(),
+			        CurrentRowType = "Header", BLANK(),
+			        CurrentItem = "Adj. GPR", _Adjusted_GPR,
+			        CurrentItem = "Effective Rental Income", _Effective_Rental,
+			        CurrentItem = "Effective Gross Revenue", _Effective_Gross_Rev,
+			        CurrentItem = "Total Controllable Expenses", _Controllable_OpEx,
+			        CurrentItem = "Total Operating Expenses", _Total_OpEx,
+			        CurrentItem = "Net Operating Income", _NOI,
+			        CurrentItem = "Cash Flow from Operations", _CashFlow,
+			        CALCULATE(
+			            SUM( 'Deal Financials'[Amount] ),
+			            'Deal Financials'[Internal Line Item] = CurrentItem
+			        )
+			    )
+			VAR _AnnualizedNumerator = _Numerator * [Annual Factor]
+			RETURN
+			    DIVIDE( _AnnualizedNumerator, _Units, 0 )
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: a0d306a5-2930-4e4c-81c9-dd8c31572fce
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% of GPR' = ```
+			
+			VAR CurrentItem = SELECTEDVALUE( 'Report Layout'[ ] )
+			VAR CurrentRowType = SELECTEDVALUE( 'Report Layout'[RowType] )
+			VAR _Revenue_Items = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Gross Potential Rent", "Loss to Lease" } )
+			VAR _Vacancy_Items = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Vacancy", "Concessions", "Bad Debt Loss" } )
+			VAR _Other_Income = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Utility Income", "Other Income" } )
+			VAR _Controllable_OpEx = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "General & Administrative", "Payroll", "Sales & Marketing", "Utilities", "Repairs & Maintenance", "Management Fee", "Turnover" } )
+			VAR _Fixed_OpEx = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "Property Taxes", "Insurance" } )
+			VAR _Below_NOI = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN { "CapEx Reserve", "Debt Service" } )
+			VAR _Adjusted_GPR = _Revenue_Items
+			VAR _Effective_Rental = _Adjusted_GPR + _Vacancy_Items
+			VAR _Effective_Gross_Rev = _Effective_Rental + _Other_Income
+			VAR _Total_OpEx = _Controllable_OpEx + _Fixed_OpEx
+			VAR _NOI = _Effective_Gross_Rev - _Total_OpEx
+			VAR _CashFlow = _NOI - _Below_NOI
+			VAR _Numerator = 
+			    SWITCH( TRUE(),
+			        CurrentRowType = "Header", BLANK(),
+			        CurrentItem = "Adj. GPR", _Adjusted_GPR,
+			        CurrentItem = "Effective Rental Income", _Effective_Rental,
+			        CurrentItem = "Effective Gross Revenue", _Effective_Gross_Rev,
+			        CurrentItem = "Total Controllable Expenses", _Controllable_OpEx,
+			        CurrentItem = "Total Operating Expenses", _Total_OpEx,
+			        CurrentItem = "Net Operating Income", _NOI,
+			        CurrentItem = "Cash Flow from Operations", _CashFlow,
+			        CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] = CurrentItem )
+			    )
+			VAR _Denominator = 
+			    SWITCH( TRUE(),
+			        CurrentItem IN { "Gross Potential Rent", "Loss to Lease" }, BLANK(),
+			        CurrentRowType = "Header", BLANK(),
+			        CurrentItem IN {
+			            "Adj. GPR",
+			            "Vacancy", 
+			            "Concessions", 
+			            "Bad Debt Loss",
+			            "Effective Rental Income",
+			            "Utility Income", 
+			            "Other Income",
+			            "Effective Gross Revenue"
+			        }, _Adjusted_GPR,
+			        _Effective_Gross_Rev
+			    )
+			RETURN
+			    DIVIDE( _Numerator, _Denominator, 0 )
+			
+			
+			 
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: a27357dc-16e8-4c80-b1a3-e918760ab1e8
+
+	measure 'Annual Factor' =
+			
+			DIVIDE(12, [Months In Window], 1)
+		formatString: #,0
+		lineageTag: d3a0280d-5d45-459a-b9ae-d333024f0ae8
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Debt Yield' = ```
+			
+			VAR _Conceptos_Suman = { 
+			    "Gross Potential Rent", "Loss to Lease", 
+			    "Vacancy", "Concessions", "Bad Debt Loss", 
+			    "Utility Income", "Other Income" 
+			}
+			VAR _Conceptos_Restan = { 
+			    "General & Administrative", "Payroll", "Sales & Marketing", 
+			    "Utilities", "Repairs & Maintenance", "Management Fee", "Turnover",
+			    "Property Taxes", "Insurance" 
+			}
+			VAR _Total_Ingresos = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN _Conceptos_Suman )
+			VAR _Total_Egresos = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN _Conceptos_Restan )
+			VAR _NOI_Raw = _Total_Ingresos - _Total_Egresos
+			VAR _FactorForzado = 
+			    CALCULATE(
+			        [Annual Factor],
+			        'View Mode'[Annualize] = "Annualized"
+			    )
+			VAR _NOI_Annualized = _NOI_Raw * _FactorForzado
+			VAR _LoanAmount = 
+			    CALCULATE(
+			        MAX( 'Deal Financials'[Loan Amount] ),
+			        REMOVEFILTERS( 'Deal Financials'[Internal Line Item] )
+			    )
+			RETURN
+			    DIVIDE( _NOI_Annualized, _LoanAmount )
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 82c55eac-ea4e-4aab-81d4-ec47beb93448
+
+	measure DSCR = ```
+			
+			VAR _Conceptos_Suman_NOI = { 
+			    "Gross Potential Rent", "Loss to Lease", 
+			    "Vacancy", "Concessions", "Bad Debt Loss", 
+			    "Utility Income", "Other Income" 
+			}
+			VAR _Conceptos_Restan_NOI = { 
+			    "General & Administrative", "Payroll", "Sales & Marketing", 
+			    "Utilities", "Repairs & Maintenance", "Management Fee", "Turnover",
+			    "Property Taxes", "Insurance" 
+			}
+			VAR _Total_Ingresos = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN _Conceptos_Suman_NOI )
+			VAR _Total_Egresos = 
+			    CALCULATE( SUM( 'Deal Financials'[Amount] ), 'Deal Financials'[Internal Line Item] IN _Conceptos_Restan_NOI )
+			VAR _NOI = _Total_Ingresos - _Total_Egresos
+			VAR _DebtService = 
+			    CALCULATE( 
+			        SUM( 'Deal Financials'[Amount] ), 
+			        'Deal Financials'[Internal Line Item] = "Debt Service" 
+			    )
+			RETURN
+			    DIVIDE( _NOI, ABS(_DebtService) )
+			```
+		formatString: #,0.00
+		lineageTag: 19946370-2623-4283-9271-5d99b8bb7009
+
+	measure 'Selected Start' = FORMAT( EOMONTH( MIN( 'DimDate'[Date] ), 0 ), "dd/MM/yyyy" )
+		lineageTag: 7936bdef-b3ed-41ce-8b07-36d97ceecaeb
+
+	measure 'Selected Date End' = ```
+			FORMAT( MAX( 'DimDate'[Date] ), "dd/MM/yyyy" )
+			 
+			```
+		lineageTag: 65c413bb-f646-4c46-b224-9304b18b5229
+
+	measure 'Annual Factor (Apply)' =
+			
+			IF(
+			    SELECTEDVALUE('View Mode'[Annualize]) = "Yes",
+			    [Annual Factor],
+			    1
+			)
+		formatString: #,0
+		lineageTag: 04039cb9-157c-4687-a1e7-9b87dcdbe47f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Months In Window' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(DimDate[Year-Month]),
+			    ALLSELECTED((DimDate[Year-Month])
+			))
+		formatString: 0
+		lineageTag: 090e1fb7-1c24-4a3d-af0d-051a159117eb
+
+	measure 'Value ACT' =
+			
+			CALCULATE(
+			    [$],
+			    'Deal Financials'[Category] = "ACT"
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 44733ed1-f3be-44f2-aab7-4d414fe54eab
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Value UW' =
+			
+			CALCULATE(
+			    [$],
+			    'Deal Financials'[Category] = "UW"
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: fa376c2d-214f-4be7-a1e4-842546f90747
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Debt Yield (%)' =
+			
+			VAR _Act = CALCULATE([Debt Yield], 'Deal Financials'[Category] = "ACT") -- Ajustar filtro ACT
+			VAR _UW  = CALCULATE([Debt Yield], 'Deal Financials'[Category] = "UW") -- Ajustar filtro UW
+			RETURN
+			    IF(
+			        _UW = 0,
+			        BLANK(),
+			        DIVIDE(_Act, _UW) - 1
+			    )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 4a337866-927c-48d8-b92e-1b987054a967
+
+	measure 'DSCR (%)' =
+			
+			VAR _Act = CALCULATE([DSCR], 'Deal Financials'[Category] = "ACT")
+			VAR _UW  = CALCULATE([DSCR], 'Deal Financials'[Category] = "UW")
+			RETURN
+			    IF(
+			        _UW = 0,
+			        BLANK(),
+			        DIVIDE(_Act, _UW) - 1
+			    )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 84bbfbfb-a244-4c73-837e-1a11801942f6
+
+	measure 'BG Color (P&L)' =
+			
+			VAR t = SELECTEDVALUE('Report Layout'[RowType])
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    t = "Header",   "#1B5E20",   -- verde
+			    t = "Highlight","#1B5E20",   -- verde (NOI / Cash Flow)
+			    t = "Subtotal", "#D9D9D9",   -- gris
+			    BLANK()
+			)
+		lineageTag: 208bf302-2620-40c9-a386-df4a90d87589
+
+	measure 'Font Color (P&L)' =
+			
+			VAR t = SELECTEDVALUE('Report Layout'[RowType])
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    t = "Header",   "#FFFFFF",
+			    t = "Highlight","#FFFFFF",
+			    "#000000"
+			)
+		lineageTag: 9a7ce77b-137b-4ef2-b6d2-bc5b51496917
+
+	measure Comments = ```
+			
+			
+			VAR CurrentItem = SELECTEDVALUE( 'Report Layout'[ ] )
+			
+			VAR CurrentRowType = SELECTEDVALUE( 'Report Layout'[RowType] )
+			 
+			VAR _Result = 
+			
+			    SWITCH(
+			
+			        TRUE(),
+			
+			        -- 1. Si es un Encabezado, devolvemos blanco
+			
+			        CurrentRowType = "Header", BLANK(),
+			 
+			        -- 2. Si es un Subtotal calculado (que no existe en la base de datos), devolvemos blanco.
+			
+			        -- (Ej: NOI, Cash Flow, Adjusted GPR no suelen tener un comentario en la tabla origen)
+			
+			        CurrentItem IN { 
+			
+			            "Adjusted Gross Potential Rent", 
+			
+			            "Effective Rental Income", 
+			
+			            "Effective Gross Revenue", 
+			
+			            "Total Controllable Expenses", 
+			
+			            "Total Operating Expenses", 
+			
+			            "Net Operating Income", 
+			
+			            "Cash Flow from Operations" 
+			
+			        }, BLANK(),
+			 
+			        -- 3. Para todo lo demás (Filas de Data), buscamos el comentario exacto
+			
+			        CALCULATE(
+			
+			            -- SELECTEDVALUE trae el texto si es único. 
+			
+			            -- Si tienes varios comentarios para un mismo ítem, usa FIRSTNONBLANK o CONCATENATEX.
+			
+			            SELECTEDVALUE( 'Deal Financials'[Comments] ),
+			
+			            'Deal Financials'[Internal Line Item] = CurrentItem
+			
+			        )
+			
+			    )
+			 
+			RETURN
+			
+			    _Result
+			 
+			```
+		lineageTag: bc2fba59-cf9b-43dc-be19-784f8b18f1a8
+
+	measure (%) =
+			
+			VAR _Act = [Value ACT] * [Annual Factor]
+			VAR _UW = [Value UW] * [Annual Factor]
+			VAR _Result =
+			    IF(
+			        OR(_UW = 0, ISBLANK(_UW)),
+			        0,
+			        DIVIDE(_Act, _UW) - 1
+			    )
+			RETURN
+			    _Result + 0
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: ac4fbf04-9a08-41bc-b536-b6553e1fd928
+
+	measure ($) = [Value ACT] - [Value UW]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: d3226413-e20c-4c1d-b745-549a3f633c85
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Column
+		isHidden
+		formatString: 0
+		lineageTag: d1b1411a-36ed-4846-a9ac-746bd7725372
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TotalMeasures = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 5b3d07e5d9534e16b5e8d93a0088d052
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

@@ -1,0 +1,125 @@
+table 'Escrow Balance'
+	lineageTag: 175067ff-6eb0-449c-b91e-e3d7f58d7e59
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: faa10421-95ac-4286-a5c5-14b609f1dc1c
+		summarizeBy: none
+		sourceColumn: Deal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account Name'
+		dataType: string
+		lineageTag: b038ec7c-b788-4bef-88e1-0e662d2a9a8b
+		summarizeBy: none
+		sourceColumn: Account Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		lineageTag: 98ee3c1e-5ac1-41c7-9348-ac77d99661e9
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: int64
+		formatString: 0
+		lineageTag: 8c49aa26-1cd3-421c-8014-d380a1f7966c
+		summarizeBy: sum
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Category Name'
+		dataType: string
+		lineageTag: 5c4132d4-ed8a-43d4-a6d3-3266c7162c5a
+		summarizeBy: none
+		sourceColumn: Category Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account Balance'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 03aa1269-ec8f-4c3d-903b-1485d4dc9cd2
+		summarizeBy: sum
+		sourceColumn: Account Balance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Account Balance Base'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: ace817b9-797b-4857-a90b-695b95213ba6
+		summarizeBy: sum
+		sourceColumn: Account Balance Base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Asset Management Name'
+		dataType: string
+		lineageTag: 408ab2c6-9f83-47ef-a161-0a483ae23bc0
+		summarizeBy: none
+		sourceColumn: Asset Management Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Latest Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 063b5a08-cf7c-4c4d-b682-18f8875fb29c
+		summarizeBy: none
+		sourceColumn: Latest Date
+
+		variation Variación
+			isDefault
+			relationship: 74c8d50b-a603-4945-b051-57cb148977e5
+			defaultHierarchy: LocalDateTable_5767df04-4ab7-4c0b-ac61-290cd7d6f225.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'Escrow Balance' = m
+		mode: import
+		source =
+				let
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				    AssetMgmt = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				    DealsActivos = Table.SelectRows(
+				        AssetMgmt,
+				        each [cr83c_name] <> null
+				            and ([cr83c_dealstatusname] = "(1) SPECIAL SERVICING"
+				                or [cr83c_dealstatusname] = "(2) WATCHLIST"
+				                or [cr83c_dealstatusname] = "(3) PERFORMING")
+				    ),
+				    Columnas = Table.SelectColumns(DealsActivos, {
+				        "cr83c_name",
+				        "cr83c_latestbalancesqb"
+				    }),
+				    RenombrarDeal = Table.RenameColumns(Columnas, {{"cr83c_name", "Deal"}}),
+				    Expand = Table.ExpandTableColumn(
+				        RenombrarDeal,
+				        "cr83c_latestbalancesqb",
+				        {"cr83c_accountname", "cr83c_name", "cr83c_category", "cr83c_categoryname", "cr83c_accountbalance", "cr83c_accountbalance_base", "cr83c_assetmanagementname", "cr83c_latestdate", "cr83c_vehicle", "cr83c_vehiclename", "cr83c_leverageoverview", "cr83c_leverageoverviewname", "cr83c_bankname", "cr83c_banknamename", "cr83c_bankaccountnumber", "cr83c_invoiceaccount", "cr83c_invoiceaccountname", "cr83c_invoiceaccountv2", "cr83c_invoiceaccountv2name", "cr83c_entity", "cr83c_entityname", "cr83c_debtservicereserve", "cr83c_debtservicereservename", "cr83c_bankaccounttype", "cr83c_bankaccounttypename"},
+				        {"Account Name", "Name", "Category", "Category Name", "Account Balance", "Account Balance Base", "Asset Management Name", "Latest Date", "Vehicle", "Vehicle Name", "Leverage Overview", "Leverage Overview Name", "Bank Name", "Bank Name Lookup", "Bank Account Number", "Invoice Account", "Invoice Account Name", "Invoice Account V2", "Invoice Account V2 Name", "Entity", "Entity Name", "Debt Service Reserve", "Debt Service Reserve Name", "Bank Account Type", "Bank Account Type Name"}
+				    ),
+				    FiltrarCuentas = Table.SelectRows(Expand, each [Account Name] <> null),
+				    FiltrarCategoria = Table.SelectRows(FiltrarCuentas, each [Category] = 591900001 or [Category] = 591900002),
+				    TiposFecha = Table.TransformColumnTypes(FiltrarCategoria, {{"Latest Date", type date}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(TiposFecha,{"Vehicle", "Vehicle Name", "Leverage Overview", "Leverage Overview Name", "Bank Name", "Bank Name Lookup", "Bank Account Number", "Invoice Account", "Invoice Account Name", "Invoice Account V2", "Invoice Account V2 Name", "Entity", "Entity Name", "Debt Service Reserve", "Debt Service Reserve Name", "Bank Account Type", "Bank Account Type Name"})
+				in
+				    #"Columnas quitadas"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

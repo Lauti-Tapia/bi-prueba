@@ -1,0 +1,36 @@
+table DimCategory
+	lineageTag: 93e73e65-ec63-41f0-86c9-018307696499
+
+	column Category
+		lineageTag: 1ec3d2a2-d230-42bd-b3e0-af3e823b5d85
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Category]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Category Order'
+		formatString: 0
+		lineageTag: e1cdcfa0-ba9c-4289-a723-31572148015b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Category Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCategory = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE(
+				    "Category", STRING, 
+				    "Category Order", INTEGER,
+				    {
+				        {"ACT", 1},
+				        {"UW", 2}
+				    }
+				)
+				```
+
+	annotation PBI_Id = 43f7d7d7ff94466ab9de77403ff9408e
+

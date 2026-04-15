@@ -1,0 +1,34 @@
+table 'View Mode'
+	lineageTag: 36b93fdf-baac-4cee-be11-3a294f8cb47b
+
+	column ID
+		formatString: 0
+		lineageTag: 5eaf798b-6fcb-4c71-aa83-e4a01b4e7150
+		summarizeBy: count
+		isNameInferred
+		sourceColumn: [ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Annualize
+		lineageTag: 37a87df2-1d99-4f43-af4f-3a09a17d419b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Annualize]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'View Mode' = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "ID", INTEGER,
+				    "Annualize", STRING,
+				    {
+				        { 1, "Yes" },
+				        { 2, "No" }
+				    }
+				)
+
+	annotation PBI_Id = 097223744ebb46b7a5974a9f6c02d198
+

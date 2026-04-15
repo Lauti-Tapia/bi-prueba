@@ -1,0 +1,79 @@
+table 'Chart Filter Items'
+	lineageTag: 6cd5500f-f9e5-425a-b814-f6c73a2a1bb5
+
+	column SortOrder
+		formatString: 0
+		lineageTag: 4b837f82-f8af-438d-8da4-30c3fd3c18b8
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Section
+		lineageTag: 2aa83ee3-1d84-44d7-8199-64350f42aaed
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Section]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Item
+		lineageTag: 2222ed27-1a23-4d10-b412-98c94e9aa52b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Item]
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCalculated
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e4e5db3a-9780-49ba-aafa-80459ba43cef
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [IsCalculated]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Chart Filter Items' = calculated
+		mode: import
+		source =
+				
+				DATATABLE (
+				    "SortOrder", INTEGER,
+				    "Section", STRING,
+				    "Item", STRING,
+				    "IsCalculated", BOOLEAN,
+				    {
+				        -- Revenue
+				        { 1,  "Revenue",  "Adj. GPR",                    TRUE  },
+				        { 2,  "Revenue",  "Vacancy",                     FALSE },
+				        { 3,  "Revenue",  "Concessions",                 FALSE },
+				        { 4,  "Revenue",  "Bad Debt Loss",               FALSE },
+				        { 5,  "Revenue",  "Effective Rental Income",     TRUE  },
+				        { 6,  "Revenue",  "Utility Income",              FALSE },
+				        { 7,  "Revenue",  "Other Income",                FALSE },
+				        { 8,  "Revenue",  "Effective Gross Revenue",     TRUE  },
+				
+				        -- Expenses & Below
+				        { 9,  "Expenses", "General & Administrative",    FALSE },
+				        { 10, "Expenses", "Payroll",                     FALSE },
+				        { 11, "Expenses", "Sales & Marketing",           FALSE },
+				        { 12, "Expenses", "Utilities",                   FALSE },
+				        { 13, "Expenses", "Repairs & Maintenance",       FALSE },
+				        { 14, "Expenses", "Management Fee",              FALSE },
+				        { 15, "Expenses", "Turnover",                    FALSE },
+				        { 16, "Expenses", "Total Controllable Expenses", TRUE  },
+				        { 17, "Expenses", "Property Taxes",              FALSE },
+				        { 18, "Expenses", "Insurance",                   FALSE },
+				        { 19, "Expenses", "Total Operating Expenses",    TRUE  },
+				        { 20, "Expenses", "Net Operating Income",        TRUE  },
+				        { 21, "Expenses", "CapEx Reserve",               FALSE },
+				        { 22, "Expenses", "Debt Service",                FALSE },
+				        { 23, "Expenses", "Cash Flow from Operations",   TRUE  }
+				    }
+				)
+
+	annotation PBI_Id = ca6562b26f214ff6a965b641cf03b753
+

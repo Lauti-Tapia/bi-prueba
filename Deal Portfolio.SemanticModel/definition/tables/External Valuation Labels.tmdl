@@ -1,0 +1,48 @@
+table 'External Valuation Labels'
+	lineageTag: e4866b66-7f73-456a-86d1-90f37c090cfb
+
+	measure 'External Valuation Value' = ```
+			
+			  SWITCH(                   
+			      SELECTEDVALUE('External Valuation Labels'[ ]),
+			      "As Is Valuation", FORMAT(SELECTEDVALUE('Valuations'[As Is Valuation], 0), "$#,##0"),
+			      "LTV - As Is", FORMAT(SELECTEDVALUE('Valuations'[LTV - As Is], 0) / 100, "0.0%"),                                                                                                       "-"
+			  )
+			```
+		lineageTag: 661622a8-a8a7-43fa-b262-804a73977628
+
+	measure 'External Valuation Date' = FORMAT(SELECTEDVALUE('Valuations'[Valuation Date]), "MM/DD/YYYY")
+		lineageTag: 643daa33-5454-4723-a9a6-99dda9a574b2
+
+	column ' '
+		lineageTag: f7e858c2-dc2d-4c42-93ad-f38bf51a4553
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		formatString: 0
+		lineageTag: d757ad20-63ac-439c-ae0b-067356d85767
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'External Valuation Labels' = calculated
+		mode: import
+		source = ```
+				
+				  DATATABLE(                                                                                                                                                                            
+				      " ", STRING,
+				      "Sort", INTEGER,
+				      {               
+				          {"As Is Valuation", 1},
+				          {"LTV - As Is", 2}
+				      })
+				```
+
+	annotation PBI_Id = 10f54ba73d58414197836502838bc17a
+

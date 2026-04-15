@@ -1,0 +1,458 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 3630.0834412359618,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1386.027428492358,
+            "y": 934.44913136713956
+          },
+          "nodeIndex": "DimDate",
+          "nodeLineageTag": "00bac8aa-7b55-47e6-89c7-2f16413c5094",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 21
+        },
+        {
+          "location": {
+            "x": 689,
+            "y": 850.396240234375
+          },
+          "nodeIndex": "Report Layout",
+          "nodeLineageTag": "93dc3ee9-2df1-4164-a1ea-3e5202f2cf16",
+          "size": {
+            "height": 371,
+            "width": 234
+          },
+          "zIndex": 12
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 1114.896240234375
+          },
+          "nodeIndex": "Deal Financials",
+          "nodeLineageTag": "ad04db33-2012-4bbd-b592-716dbeadc349",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 13
+        },
+        {
+          "location": {
+            "x": 992,
+            "y": 1384.646240234375
+          },
+          "nodeIndex": "UID - Categories",
+          "nodeLineageTag": "42011c9b-dfcd-4747-a80e-2d155cc9e649",
+          "size": {
+            "height": 72,
+            "width": 234
+          },
+          "zIndex": 14,
+          "expandedHeight": 224
+        },
+        {
+          "location": {
+            "x": 1010,
+            "y": 1057.646240234375
+          },
+          "nodeIndex": "UW Financials",
+          "nodeLineageTag": "71dd610f-632a-46b1-a8bf-df4196285534",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 15,
+          "expandedHeight": 300
+        },
+        {
+          "location": {
+            "x": 309,
+            "y": 1342.458740234375
+          },
+          "nodeIndex": "DimCategory",
+          "nodeLineageTag": "93e73e65-ec63-41f0-86c9-018307696499",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 16
+        },
+        {
+          "location": {
+            "x": 1207,
+            "y": 1371.146240234375
+          },
+          "nodeIndex": "TotalMeasures",
+          "nodeLineageTag": "67b0ba8f-f2c1-4f05-a47f-dbfbbece0d3c",
+          "size": {
+            "height": 72,
+            "width": 234
+          },
+          "zIndex": 17,
+          "expandedHeight": 200
+        },
+        {
+          "location": {
+            "x": 1843.1453264478391,
+            "y": 1328.5173339612666
+          },
+          "nodeIndex": "U_Measures",
+          "nodeLineageTag": "816afede-0d92-4377-a41d-03823f659005",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 18
+        },
+        {
+          "location": {
+            "x": 617,
+            "y": 1309.771240234375
+          },
+          "nodeIndex": "View Mode",
+          "nodeLineageTag": "36b93fdf-baac-4cee-be11-3a294f8cb47b",
+          "size": {
+            "height": 72,
+            "width": 234
+          },
+          "zIndex": 19,
+          "expandedHeight": 200
+        },
+        {
+          "location": {
+            "x": 147.80397811494686,
+            "y": 144.48414403155888
+          },
+          "nodeIndex": "Last Refresh",
+          "nodeLineageTag": "8bba0597-3aa9-4815-9df6-e6075bbc722f",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 20
+        },
+        {
+          "location": {
+            "x": 1491.6992735336173,
+            "y": 0
+          },
+          "nodeIndex": "Granularity X",
+          "nodeLineageTag": "ba47af65-a460-4dfd-9022-e3373a4cc618",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 1963.6200856741082,
+            "y": 0
+          },
+          "nodeIndex": "Chart Filter Items",
+          "nodeLineageTag": "6cd5500f-f9e5-425a-b814-f6c73a2a1bb5",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 2339.2181351268932,
+            "y": 0
+          },
+          "nodeIndex": "Expenses Filter",
+          "nodeLineageTag": "b07abc42-c5d5-4181-85a7-bb73880a60da",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 2593.1453264478391,
+            "y": 0
+          },
+          "nodeIndex": "Revenue Filter",
+          "nodeLineageTag": "997caa04-061b-49a3-beed-4d7edceb9122",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 73.194130596703417,
+            "y": 550.35503673069866
+          },
+          "nodeIndex": "DimDeals",
+          "nodeLineageTag": "c5356e1c-7273-4d3b-92b9-2edb8da94af2",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 1337.888944468714,
+            "y": 151.24258112898724
+          },
+          "nodeIndex": "FactInsurance",
+          "nodeLineageTag": "c9b7f870-f1bf-4156-a5ca-2e0995b058e0",
+          "size": {
+            "height": 389.44710886723544,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 838.733404190637,
+            "y": 152.3233921223474
+          },
+          "nodeIndex": "FactCovenants",
+          "nodeLineageTag": "58dda19e-6794-4969-acce-ab13e7b4e96a",
+          "size": {
+            "height": 341.4106985496461,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 1089.6132226153204,
+            "y": 150.96863966096714
+          },
+          "nodeIndex": "FactCriticalDates",
+          "nodeLineageTag": "9219fda4-75fa-45a1-961c-f33c8a2987d1",
+          "size": {
+            "height": 367.91354562141953,
+            "width": 234
+          },
+          "zIndex": 22
+        },
+        {
+          "location": {
+            "x": 590.32952876651109,
+            "y": 147.13623678051943
+          },
+          "nodeIndex": "FactTax",
+          "nodeLineageTag": "c6da1252-b57b-4233-a005-2de5f1944749",
+          "size": {
+            "height": 348.03641031758946,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 2877.1453264478391,
+            "y": 623.2293701171875
+          },
+          "nodeIndex": "Escrow Balance",
+          "nodeLineageTag": "175067ff-6eb0-449c-b91e-e3d7f58d7e59",
+          "size": {
+            "height": 408.2832353588434,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 3161.1453264478391,
+            "y": 621.2293701171875
+          },
+          "nodeIndex": "Mortage Statement",
+          "nodeLineageTag": "5045fd71-7fc0-4c92-bad6-1fd2b61d53ad",
+          "size": {
+            "height": 533.430936667069,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 3445.1453264478391,
+            "y": 621.2293701171875
+          },
+          "nodeIndex": "Projections Advance & Payoff",
+          "nodeLineageTag": "1cef2c60-50da-4f8e-882c-c576d7b87525",
+          "size": {
+            "height": 505.36012782735827,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 2139.3788804789069,
+            "y": 892.01983862905615
+          },
+          "nodeIndex": "Deal Overview",
+          "nodeLineageTag": "e0b10e01-d7af-4e8c-8dcf-531dd9484f0d",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2229.6187996926783,
+            "y": 364.43890160531879
+          },
+          "nodeIndex": "Collateral",
+          "nodeLineageTag": "bb35fa33-5e78-4ce4-8146-139b84ce711b",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3729.1453264478391,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "Deal Overview Layout",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4013.1453264478391,
+            "y": 623.2293701171875
+          },
+          "nodeIndex": "Leverage",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4297.1453264478387,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "Leverage Labels",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4581.1453264478387,
+            "y": 647.2293701171875
+          },
+          "nodeIndex": "Valuations",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4865.1453264478387,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "Valuation Labels",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5149.1453264478387,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "AssetType Table",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5433.1453264478387,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "Loan Details Layout",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5717.1453264478387,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "Return Metrics Layout",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6001.1453264478387,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "Internal Valuation Labels",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 6285.1453264478387,
+            "y": 671.2293701171875
+          },
+          "nodeIndex": "External Valuation Labels",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas las tablas",
+      "zoomValue": 42.836480901126542,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas las tablas",
+  "defaultDiagram": "Todas las tablas"
+}

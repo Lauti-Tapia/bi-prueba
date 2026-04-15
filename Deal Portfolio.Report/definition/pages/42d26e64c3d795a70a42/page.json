@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "42d26e64c3d795a70a42",
+  "displayName": "Servicing",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

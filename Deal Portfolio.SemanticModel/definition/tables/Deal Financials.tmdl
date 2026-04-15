@@ -1,0 +1,187 @@
+table 'Deal Financials'
+	lineageTag: ad04db33-2012-4bbd-b592-716dbeadc349
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: cf4865a1-00c6-4cd7-b5f9-ba1696dcd813
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Deal number'
+		dataType: string
+		lineageTag: c8bb2b97-cfd5-4a1a-89ad-1658592d69a0
+		summarizeBy: none
+		sourceColumn: cr83c_dealnumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 5c08bcb7-6338-4404-9418-c706ef986316
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Amount
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 4df9b2b9-7b20-4d64-8aa3-085efe4cabbf
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Account Category'
+		dataType: string
+		lineageTag: 37d4638f-0f82-431b-ab8b-f2f9801fc473
+		summarizeBy: none
+		sourceColumn: Account Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-Category
+		dataType: string
+		lineageTag: cfd359d7-5e25-4d68-bb02-5b372a7909ab
+		summarizeBy: none
+		sourceColumn: Sub-Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comments
+		dataType: string
+		lineageTag: 08a68b44-8582-4b18-8506-8d45404ddf0b
+		summarizeBy: none
+		sourceColumn: Comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Internal Line Item'
+		dataType: string
+		lineageTag: 42cc0699-615b-49c4-9be7-f09cf02c4600
+		summarizeBy: none
+		sourceColumn: Internal Line Item
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Property Size'
+		dataType: int64
+		formatString: 0
+		lineageTag: e2916703-626e-4500-b5db-9075b59bd8a4
+		summarizeBy: sum
+		sourceColumn: Property Size
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loan Amount'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: fc561258-ac4e-4a1f-a8d8-9db02a33b538
+		summarizeBy: sum
+		sourceColumn: Loan Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Category
+		dataType: string
+		lineageTag: 07baf85b-d4d7-4af6-8d3a-fe5ccb3789f9
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Deal Financials' = m
+		mode: import
+		source = ```
+				let
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				    dbo_cr83c_assetmanagement = Origen{[Schema="dbo",Item="cr83c_assetmanagement"]}[Data],
+				    dbo_cr83c_loancollateral = Origen{[Schema="dbo",Item="cr83c_loancollateral"]}[Data],
+				 
+				    #"Filas filtradas" = Table.SelectRows(dbo_cr83c_assetmanagement, each ([cr83c_isactive] = true)),
+				 
+				    #"Consultas combinadas" = Table.NestedJoin(
+				        #"Filas filtradas", {"cr83c_loancollateral"}, 
+				        dbo_cr83c_loancollateral, {"cr83c_loancollateralid"}, 
+				        "LoanCollateral_Record", 
+				        JoinKind.LeftOuter
+				    ),
+				 
+				    #"Expandir LoanCollateral" = Table.ExpandTableColumn(
+				        #"Consultas combinadas", "LoanCollateral_Record", 
+				        {"cr83c_propertysize"}, {"Property Size"}
+				    ),
+				 
+				    #"Se expandió cr83c_dealfinancials" = Table.ExpandTableColumn(#"Expandir LoanCollateral", "cr83c_dealfinancials",
+				        {
+				            "cr83c_date", "cr83c_amount", 
+				            "cr83c_accountcategoryname", "cr83c_accountcategory", 
+				            "cr83c_accountsubcategoryname", "cr83c_accountsubcategory", 
+				            "cr83c_comments", "cr83c_internallineitemname"
+				        },
+				        {
+				            "Date", "Amount", 
+				            "Account Category Name", "Account Category ID", 
+				            "Sub-Category Name", "Sub-Category ID", 
+				            "Comments", "Internal Line Item"
+				        }
+				    ),
+				 
+				    #"Normalizar IDs" = Table.TransformColumns(#"Se expandió cr83c_dealfinancials",{
+				        {"Account Category ID", each try Text.Lower(Text.From(_)) otherwise null, type text}, 
+				        {"Sub-Category ID", each try Text.Lower(Text.From(_)) otherwise null, type text}
+				    }),
+				 
+				    #"Logica Correccion" = Table.AddColumn(#"Normalizar IDs", "FixedData", each 
+				        let
+				            AcID = [#"Account Category ID"],
+				            ScID = [#"Sub-Category ID"],
+				            OrigAC = [#"Account Category Name"],
+				            OrigSC = [#"Sub-Category Name"]
+				        in
+				            if ScID = "591900014" and AcID = "591900007" then [AC="Below the line", SC="CapEx Reserve"]
+				            else if ScID = "591900017" and AcID = "591900000" then [AC=OrigAC, SC="Other Income"]
+				            else if ScID = "591900015" and AcID = "591900001" then [AC=OrigAC, SC="HOA"]
+				            else if ScID = "591900016" and AcID = "591900002" then [AC=OrigAC, SC="Ground Lease"]
+				            else [
+				                AC = if OrigAC = null then "Unassigned" else OrigAC, 
+				                SC = if OrigSC = null then "Unassigned" else OrigSC
+				            ]
+				    ),
+				 
+				    #"Expandir Corregidos" = Table.ExpandRecordColumn(#"Logica Correccion", "FixedData", {"AC", "SC"}, {"Account Category", "Sub-Category"}),
+				 
+				    #"Columnas Seleccionadas" = Table.SelectColumns(#"Expandir Corregidos",
+				        {"Date", "cr83c_name", "cr83c_dealnumber", "Property Size", "Amount", "Account Category", "Sub-Category", "Internal Line Item", "Comments", "cr83c_originalcommitment"}
+				    ),
+				 
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas Seleccionadas",{{"cr83c_originalcommitment", "Loan Amount"}}),
+				 
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado",{
+				        {"Date", type date}, 
+				        {"Amount", Currency.Type}, 
+				        {"Property Size", Int64.Type},
+				        {"Loan Amount", Currency.Type},
+				        {"Account Category", type text},
+				        {"Sub-Category", type text}
+				    }),
+				 
+				    #"Agregar Category" = Table.AddColumn(#"Tipo cambiado", "Category", each "ACT", type text),
+				    #"Consulta anexada" = Table.Combine({#"Agregar Category", #"UW Financials"})
+				in
+				    #"Consulta anexada"
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Exception
+

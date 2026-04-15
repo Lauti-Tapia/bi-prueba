@@ -1,0 +1,108 @@
+table DimDate
+	lineageTag: 00bac8aa-7b55-47e6-89c7-2f16413c5094
+
+	measure DealActiveDate = VAR HasData = NOT(ISEMPTY('Deal Financials')) RETURN IF(HasData, 1, 0)
+		formatString: 0
+		lineageTag: 4b09b054-d43e-4d3e-9a4a-fc9a9361a9f2
+
+	column Date
+		formatString: Short Date
+		lineageTag: 930b65af-003d-4606-9526-364dbe78f853
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variación
+			isDefault
+			relationship: 7578fa83-c173-4e7e-adac-b642e4fa09a1
+			defaultHierarchy: LocalDateTable_f81bd40f-89d9-400b-af34-e5b7f165ce89.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		formatString: 0
+		lineageTag: afb65d96-304f-464e-8c12-e5c3af44f35a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month No'
+		formatString: 0
+		lineageTag: aa9c0992-1659-4c8e-a6d5-19d499fb8f7f
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Month No]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		lineageTag: b71d0699-a587-466d-9279-9090b7e6485c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year-Month
+		lineageTag: 9cfd74dd-5b54-4e03-a5ad-af8def74501f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year-Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonthSort
+		formatString: 0
+		lineageTag: 66cbcf7c-bf04-4141-9d61-d89431947705
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [YearMonthSort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Quarter No'
+		formatString: 0
+		lineageTag: 8f000585-1e29-4bde-8831-3d052fa0206a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Quarter No]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year-Quarter
+		lineageTag: 3a9a00ad-3c9b-4b51-ac00-59c27c0abb2c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year-Quarter]
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearQuarterSort
+		formatString: 0
+		lineageTag: 2b39f073-4cff-456f-91ea-fbf8f6e46835
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [YearQuarterSort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDate = calculated
+		mode: import
+		source =
+				
+				ADDCOLUMNS (
+				    CALENDARAUTO(),
+				    "Year", YEAR ( [Date] ),
+				    "Month No", MONTH ( [Date] ),
+				    "Month Name", FORMAT ( [Date], "mmmm" ),
+				    "Year-Month", FORMAT ( [Date], "yyyy-MM" ),
+				    "YearMonthSort", YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
+				    "Quarter No", QUARTER ( [Date] ),
+				    "Year-Quarter", FORMAT ( [Date], "yyyy" ) & " Q" & QUARTER ( [Date] ),
+				    "YearQuarterSort", YEAR ( [Date] ) * 10 + QUARTER ( [Date] )
+				)
+
+	annotation PBI_Id = e6cacf64e64440e4bf26319546cbc086
+

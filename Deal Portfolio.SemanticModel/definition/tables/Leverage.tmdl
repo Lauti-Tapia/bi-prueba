@@ -1,0 +1,162 @@
+table Leverage
+	lineageTag: fbb08f5a-3d01-4eba-9254-4b22203f4074
+
+	column 'Deal Name'
+		dataType: string
+		lineageTag: e3c11e59-7afb-407f-a3ff-f364c8581ebe
+		summarizeBy: none
+		sourceColumn: Deal Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Commitment
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: a78b0586-81ca-4243-96df-158a10127a3e
+		summarizeBy: sum
+		sourceColumn: Commitment
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Provider
+		dataType: string
+		lineageTag: 9d1083db-377a-4ae8-9710-be20d62053da
+		summarizeBy: none
+		sourceColumn: Provider
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Max Amount'
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 665cc482-8be0-4c1d-8649-5707917784fe
+		summarizeBy: sum
+		sourceColumn: Max Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Leverage Drawn'
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: bef0a74e-c05d-48bc-a268-67b5d779d027
+		summarizeBy: sum
+		sourceColumn: Leverage Drawn
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Note Rate'
+		dataType: string
+		lineageTag: 0746f86a-ce68-4461-91b3-d17c912131e3
+		summarizeBy: none
+		sourceColumn: Note Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Leverage Available'
+		dataType: double
+		lineageTag: db19b9f8-b340-48ea-bfe4-5d0465343aa4
+		summarizeBy: sum
+		sourceColumn: Leverage Available
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Max Leverage'
+		dataType: double
+		formatString: 0%;-0%;0%
+		lineageTag: 3beeffc8-24bd-41b5-b16e-054320ad4c9e
+		summarizeBy: sum
+		sourceColumn: Max Leverage
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Leverage Ratio'
+		dataType: double
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 974f5752-f963-49ef-b36b-b7f7dff552e9
+		summarizeBy: sum
+		sourceColumn: Leverage Ratio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Leverage = m
+		mode: import
+		source = ```
+				let
+				      Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				      dbo_cr83c_assetmanagement = Origen{[Schema="dbo",Item="cr83c_assetmanagement"]}[Data],
+				      #"Filas filtradas" = Table.SelectRows(dbo_cr83c_assetmanagement, each ([cr83c_isactive] = true)),
+				      #"Columnas seleccionadas" = Table.SelectColumns(#"Filas filtradas",{
+				          "cr83c_name",
+				          "cr83c_originalcommitment",
+				          "cra7e_cpleveragepledgebydeal"
+				      }),
+				      #"Expandir Leverage" = Table.ExpandTableColumn(#"Columnas seleccionadas",
+				          "cra7e_cpleveragepledgebydeal",
+				          {
+				              "cr83c_cra7e_test22name",
+				              "cra7e_approvedleveragemaximum"
+				          },
+				          {
+				              "Test 22",
+				              "Max Leverage Amount"
+				          }
+				      ),
+				      #"Columnas renombradas" = Table.RenameColumns(#"Expandir Leverage",{
+				          {"cr83c_name", "Deal Name"},
+				          {"cr83c_originalcommitment", "Commitment"}
+				      }),
+				 
+				      // Traer tabla cra7e_test22
+				      dbo_cra7e_test22 = Origen{[Schema="dbo",Item="cra7e_test22"]}[Data],
+				      #"Test22 Columnas" = Table.SelectColumns(dbo_cra7e_test22, {
+				          "cra7e_leverageprovider",
+				          "cr83c_leverageoutstanding",
+				          "cra7e_interestrate"
+				      }),
+				 
+				      // Merge: Test 22 = cra7e_leverageprovider
+				      #"Merge" = Table.NestedJoin(
+				          #"Columnas renombradas", {"Test 22"},
+				          #"Test22 Columnas", {"cra7e_leverageprovider"},
+				          "Test22Data", JoinKind.LeftOuter
+				      ),
+				      #"Expandir Test22" = Table.ExpandTableColumn(#"Merge", "Test22Data",
+				          {"cr83c_leverageoutstanding", "cra7e_interestrate"},
+				          {"Leverage Outstanding", "Interest Rate"}
+				      ),
+				 
+				      // Leverage Available = Commitment - Leverage Outstanding
+				      #"Leverage Available" = Table.AddColumn(#"Expandir Test22", "Leverage Available", each
+				          if [Commitment] <> null and [Leverage Outstanding] <> null
+				          then [Commitment] - [Leverage Outstanding]
+				          else null, type number),
+				 
+				      // Leverage Utilization % = Max Leverage Amount / Commitment
+				      // Ej: Max=52,800,000 / Commitment=66,000,000 → 0.80 (80%)
+				      #"Leverage %" = Table.AddColumn(#"Leverage Available", "Leverage Utilization %", each
+				          if [Commitment] <> null and [Commitment] <> 0 and [Max Leverage Amount] <> null
+				          then [Max Leverage Amount] / [Commitment]
+				          else null, type number),
+				 
+				      // Commitment to Collateral Ratio = Leverage Outstanding / Commitment
+				      #"Commitment Ratio" = Table.AddColumn(#"Leverage %", "Commitment to Collateral Ratio", each
+				          if [Commitment] <> null and [Commitment] <> 0 and [Leverage Outstanding] <> null
+				          then [Leverage Outstanding] / [Commitment]
+				          else null, type number),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Commitment Ratio",{{"Test 22", "Provider"}, {"Max Leverage Amount", "Max Amount"}, {"Leverage Utilization %", "Max Leverage"}, {"Commitment to Collateral Ratio", "Leverage Ratio"}, {"Leverage Outstanding", "Leverage Drawn"}, {"Interest Rate", "Note Rate"}})
+				  in
+				      #"Columnas con nombre cambiado"
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

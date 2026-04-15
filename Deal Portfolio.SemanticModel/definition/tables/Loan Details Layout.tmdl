@@ -1,0 +1,53 @@
+table 'Loan Details Layout'
+	lineageTag: 7a070200-96b9-4ca3-8c97-4138d986e20d
+
+	measure 'Loan Details Value' = ```
+			
+			  VAR _Metric = SELECTEDVALUE('Loan Details Layout'[ ])
+			  RETURN
+			  SWITCH(
+			      _Metric,
+			      "Loan Type", SELECTEDVALUE('Deal Overview'[Loan Type 2]),
+			      "Note Rate (Floor)", SELECTEDVALUE('Deal Overview'[Note Rate (Floor)]),
+			      "Term", SELECTEDVALUE('Deal Overview'[Term]),
+			      "Extension Options", SELECTEDVALUE('Deal Overview'[Extension Options]),
+			      "Guaranty", SELECTEDVALUE('Deal Overview'[Guaranty]),
+			      BLANK()
+			  )
+			```
+		lineageTag: b1a62a42-a096-47e2-8643-2d648aebaf01
+
+	column SortOrder
+		formatString: 0
+		lineageTag: ce738a6e-324f-47c4-b4dc-c337feb06547
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' '
+		lineageTag: 980e2764-4a06-4c3e-8ae6-4c6abf13d343
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Loan Details Layout' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				      "SortOrder", INTEGER,
+				      " ", STRING,
+				      {
+				          {1, "Loan Type"},
+				          {2, "Note Rate (Floor)"},
+				          {3, "Term"},
+				          {4, "Extension Options"},
+				          {5, "Guaranty"}
+				      }
+				)
+
+	annotation PBI_Id = a407c5261a984ffc8a00b90af72f5153
+

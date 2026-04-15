@@ -1,0 +1,203 @@
+table 'Projections Advance & Payoff'
+	lineageTag: 1cef2c60-50da-4f8e-882c-c576d7b87525
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: 9a07a53a-cf91-449e-b2a6-b25cf9d932d5
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: ab82cc16-65e8-4737-952c-c7189f6345b8
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Projected/Actual
+		dataType: string
+		lineageTag: 026f8300-9375-42b9-8986-e1b0430b1fce
+		summarizeBy: none
+		sourceColumn: Projected/Actual
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Projected Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 4b43fd47-a3d4-4407-990b-ab456ca5df9c
+		summarizeBy: none
+		sourceColumn: Projected Date
+
+		variation Variación
+			isDefault
+			relationship: 8a47b786-1a72-4991-94d2-cb1e40de13f3
+			defaultHierarchy: LocalDateTable_36df3da9-1ddb-47c9-850b-600a3059e471.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Actual Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: a7b61b1a-f1ac-45cc-be70-24782a0b2723
+		summarizeBy: none
+		sourceColumn: Actual Date
+
+		variation Variación
+			isDefault
+			relationship: 2da93e51-0ce3-4771-a1df-8b27c7569195
+			defaultHierarchy: LocalDateTable_b3b716de-3f33-4595-a671-2fe1cfdbfe88.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Funding Amount'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 1fd7802a-81d6-4ec2-947d-78debe0968f9
+		summarizeBy: sum
+		sourceColumn: Funding Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Total Outstanding Loan Balance'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: ec8fe596-7084-4345-bffc-eca8c8568666
+		summarizeBy: sum
+		sourceColumn: Total Outstanding Loan Balance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Probability
+		dataType: double
+		lineageTag: d27481f1-8ff2-401a-b2de-74a6a14b6e10
+		summarizeBy: sum
+		sourceColumn: Probability
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Notes
+		dataType: string
+		lineageTag: 5e1d3b96-c4a0-48d1-9690-1e74d3a9459b
+		summarizeBy: none
+		sourceColumn: Notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Currency
+		dataType: string
+		lineageTag: 8db02651-4929-4751-8696-91928a352df6
+		summarizeBy: none
+		sourceColumn: Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Forced Schedule'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c774fc25-cc6a-4509-a161-d1ac83399839
+		summarizeBy: none
+		sourceColumn: Forced Schedule
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Forced Schedule Name'
+		dataType: string
+		lineageTag: 0123aa62-e667-41a9-87d8-549edb0570a1
+		summarizeBy: none
+		sourceColumn: Forced Schedule Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Leverage
+		dataType: double
+		lineageTag: 00bdd2db-c0be-4126-b811-ae458d72c395
+		summarizeBy: sum
+		sourceColumn: Leverage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Equity Calc'
+		dataType: double
+		lineageTag: cce21392-d00e-4904-9592-18e4b7f065fb
+		summarizeBy: sum
+		sourceColumn: Equity Calc
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Projections Advance & Payoff' = m
+		mode: import
+		source =
+				let
+				
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				
+				    AssetMgmt = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				
+				    DealsActivos = Table.SelectRows(
+				
+				        AssetMgmt,
+				
+				        each [cr83c_name] <> null
+				
+				            and ([cr83c_dealstatusname] = "(1) SPECIAL SERVICING"
+				
+				                or [cr83c_dealstatusname] = "(2) WATCHLIST"
+				
+				                or [cr83c_dealstatusname] = "(3) PERFORMING")
+				
+				    ),
+				
+				    Columnas = Table.SelectColumns(DealsActivos, {
+				
+				        "cr83c_name",
+				
+				        "cr83c_dealadvances"
+				
+				    }),
+				
+				    Expand = Table.ExpandTableColumn(
+				
+				        Columnas,
+				
+				        "cr83c_dealadvances",
+				
+				        {"statuscodename", "cr83c_projectedactualname", "cr83c_originalprojecteddate", "cr83c_actualdate", "cr83c_fundingamount", "cr83c_totaloutstandingloanbalance", "cr83c_probability", "cr83c_notes", "transactioncurrencyidname", "cr83c_forcedschedule", "cr83c_forcedschedulename", "cr83c_leverage", "cr83c_equitycalc"},
+				
+				        {"Status", "Projected/Actual", "Projected Date", "Actual Date", "Funding Amount", "Total Outstanding Loan Balance", "Probability", "Notes", "Currency", "Forced Schedule", "Forced Schedule Name", "Leverage", "Equity Calc"}
+				
+				    ),
+				
+				    ConvertirProbabilidad = Table.TransformColumns(Expand, {
+				
+				        {"Probability", each if _ = null then null else _ / 100, type number}
+				
+				    }),
+				
+				    TiposFecha = Table.TransformColumnTypes(ConvertirProbabilidad,{{"Projected Date", type date}, {"Actual Date", type date}, {"Probability", Percentage.Type}})
+				
+				in
+				
+				    TiposFecha
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Exception
+

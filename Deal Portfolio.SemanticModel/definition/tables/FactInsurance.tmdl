@@ -1,0 +1,165 @@
+table FactInsurance
+	lineageTag: c9b7f870-f1bf-4156-a5ca-2e0995b058e0
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: 3e77181c-4def-4986-8e05-90bd335e87fd
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Policy
+		dataType: string
+		lineageTag: f3da9279-1fbd-476d-a2d7-9f2972e9e761
+		summarizeBy: none
+		sourceColumn: Policy
+
+		annotation SummarizationSetBy = Automatic
+
+	column Company
+		dataType: string
+		lineageTag: 3931387b-6f79-475e-ab4a-d3916343c8e0
+		summarizeBy: none
+		sourceColumn: Company
+
+		annotation SummarizationSetBy = Automatic
+
+	column Currency
+		dataType: string
+		lineageTag: 358c5a08-c3ec-429e-af26-64cb3a8bac68
+		summarizeBy: none
+		sourceColumn: Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: int64
+		formatString: 0
+		lineageTag: 677ed380-5f2f-42d8-87c9-1a90898fe3df
+		summarizeBy: sum
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Status Code Name'
+		dataType: string
+		lineageTag: 94b8725e-e2cd-40a6-853e-c8fb99c86bb6
+		summarizeBy: none
+		sourceColumn: Status Code Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loans Under Management'
+		dataType: string
+		lineageTag: 0da4b7b5-bca0-443b-9193-95bcabee1a59
+		summarizeBy: none
+		sourceColumn: Loans Under Management
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Policy Type'
+		dataType: string
+		lineageTag: 87f38214-5ee4-468e-8900-fb968b9b4ca8
+		summarizeBy: none
+		sourceColumn: Policy Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asset Management Name'
+		dataType: string
+		lineageTag: 8db1d5e4-4aa3-4f34-ab75-d88dc1518d8b
+		summarizeBy: none
+		sourceColumn: Asset Management Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Premium Amount'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 61e4aaab-9a65-43b6-af47-1784eadbcae7
+		summarizeBy: sum
+		sourceColumn: Premium Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Premium Amount Base'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: d19ed584-3961-4714-8cb5-a52491f3fcc2
+		summarizeBy: sum
+		sourceColumn: Premium Amount Base
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Expiration Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 988eb96a-d857-4657-9105-0445ee82ae01
+		summarizeBy: none
+		sourceColumn: Expiration Date
+
+		variation Variación
+			isDefault
+			relationship: fa9ae2af-0eb9-40e5-82ac-fd62544b5979
+			defaultHierarchy: LocalDateTable_0aee0d6e-1c35-4f7e-8638-1eedf6fa3193.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactInsurance = m
+		mode: import
+		source =
+				let
+				
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				
+				    AssetMgmt = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				
+				    DealsActivos = Table.SelectRows(
+				
+				        AssetMgmt,
+				
+				        each [cr83c_name] <> null
+				
+				            and ([cr83c_dealstatusname] = "(1) SPECIAL SERVICING"
+				
+				                or [cr83c_dealstatusname] = "(2) WATCHLIST"
+				
+				                or [cr83c_dealstatusname] = "(3) PERFORMING")
+				
+				    ),
+				
+				    Columnas = Table.SelectColumns(DealsActivos, {
+				
+				        "cr83c_name",
+				
+				        "cr83c_insurancedetails1"
+				
+				    }),
+				
+				    Expand = Table.ExpandTableColumn(
+				
+				        Columnas,
+				
+				        "cr83c_insurancedetails1",
+				
+				        {"statuscodename", "cr83c_loansundermanagementname", "cr83c_policytypename", "cr83c_assetmanagementname", "cr83c_policy", "cr83c_insurancecompanyname", "cr83c_premiumamount", "transactioncurrencyidname", "cr83c_premiumamount_base", "cr83c_status", "cr83c_expirationdate"},
+				
+				        {"Status Code Name", "Loans Under Management", "Policy Type", "Asset Management Name", "Policy", "Company", "Premium Amount", "Currency", "Premium Amount Base", "Status", "Expiration Date"}
+				
+				    ),
+				
+				    SoloActivos = Table.SelectRows(Expand, each [Status Code Name] = "Active")
+				
+				in
+				
+				    SoloActivos
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

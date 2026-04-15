@@ -1,0 +1,236 @@
+table Valuations
+	lineageTag: 11b54f1e-9678-4db5-8a0d-7e71ee6bb775
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: 1752d2e4-7302-40fb-ad9f-84a717223705
+		summarizeBy: none
+		sourceColumn: Deal Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'As Is Valuation'
+		dataType: double
+		lineageTag: 32c82453-e4b2-41cc-9e19-80936c1b9bcb
+		summarizeBy: sum
+		sourceColumn: As Is Valuation
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LTV - As Is'
+		dataType: double
+		lineageTag: 5ad269e9-2b30-448f-b46d-5188e8e3d2a1
+		summarizeBy: sum
+		sourceColumn: LTV - As Is
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'As Is Valuation (Internal)'
+		dataType: double
+		lineageTag: 8b80557f-67d5-4e0c-9f29-dc1ccbb3533f
+		summarizeBy: sum
+		sourceColumn: As Is Valuation (Internal)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LTV - As Is (Internal)'
+		dataType: double
+		lineageTag: 527f883c-84d7-41e9-8b15-262f04d0006e
+		summarizeBy: sum
+		sourceColumn: LTV - As Is (Internal)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'As Stable Valuation (Internal)'
+		dataType: double
+		lineageTag: 66801d01-f09c-4702-898b-54f806ed2e40
+		summarizeBy: sum
+		sourceColumn: As Stable Valuation (Internal)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LTV - As Stable (Internal)'
+		dataType: double
+		lineageTag: 10927ea5-2065-472d-add3-40c62b0dbdab
+		summarizeBy: sum
+		sourceColumn: LTV - As Stable (Internal)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Valuation Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 82c11f2a-4678-42c1-b195-8dcfd610c748
+		summarizeBy: none
+		sourceColumn: Valuation Date
+
+		variation Variación
+			isDefault
+			relationship: d8644530-a548-4525-ad65-616592129f6a
+			defaultHierarchy: LocalDateTable_2f17c6b3-1a47-47d7-a22c-475396d21380.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Internal Valuation Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 1924fb8f-fad2-47ad-8fca-07c11f675093
+		summarizeBy: none
+		sourceColumn: Internal Valuation Date
+
+		variation Variación
+			isDefault
+			relationship: cf612726-51d7-4036-b8f0-a88e7fa4c806
+			defaultHierarchy: LocalDateTable_9614716c-3c4f-47c7-bb5b-b06eb51be260.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Valuations = m
+		mode: import
+		source =
+				let
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				    dbo_cr83c_assetmanagement = Origen{[Schema="dbo",Item="cr83c_assetmanagement"]}[Data],
+				    #"Filas filtradas" = Table.SelectRows(dbo_cr83c_assetmanagement, each ([cr83c_isactive] = true)),
+				    #"Expandir Valuations" = Table.ExpandTableColumn(#"Filas filtradas", "cr83c_loanvaluations",
+				        {
+				            "cr83c_valuationcategoryname",
+				            "cr83c_asisvaluation",
+				            "cr83c_asstablevaluation",
+				            "cr83c_ascompletevaluation",
+				            "cr83c_ltvcalculation",
+				            "cr83c_appraiser",
+				            "cr83c_valuationdescription",
+				            "cr83c_valuationdate"
+				        },
+				        {
+				            "Category",
+				            "As Is Valuation Raw",
+				            "As Stable Valuation Raw",
+				            "As Complete Valuation Raw",
+				            "LTV Calculation",
+				            "Appraiser",
+				            "Valuation Description",
+				            "Valuation Date"
+				        }
+				    ),
+				    #"Columnas seleccionadas" = Table.SelectColumns(#"Expandir Valuations",{
+				        "cr83c_name", "Category", "As Is Valuation Raw", "As Stable Valuation Raw",
+				        "As Complete Valuation Raw", "LTV Calculation", "Appraiser", "Valuation Description",
+				        "Valuation Date"
+				    }),
+				    #"Renombrar" = Table.RenameColumns(#"Columnas seleccionadas",{{"cr83c_name", "Deal Name"}}),
+				    // 23/03/2026 - Agrupar por Deal + Category, sumar valuations, tomar max fecha con ajuste UTC-3
+				    #"Agrupado" = Table.Group(#"Renombrar", {"Deal Name", "Category"}, {
+				        {"As Is Sum", each List.Sum([As Is Valuation Raw]), type number},
+				        {"As Stable Sum", each List.Sum([As Stable Valuation Raw]), type number},
+				        {"As Complete Sum", each List.Sum([As Complete Valuation Raw]), type number},
+				        {"Valuation Date", each
+				            let
+				                maxDt = List.Max([Valuation Date])
+				            in
+				                if maxDt <> null then DateTime.Date(DateTime.AddZone(maxDt, -3)) else null, type date}
+				    }),
+				    // Separar por categoría
+				    #"Updated" = Table.SelectRows(#"Agrupado", each [Category] = "Updated Appraisal"),
+				    #"Origination" = Table.SelectRows(#"Agrupado", each [Category] = "Origination Appraisal"),
+				    #"Internal" = Table.SelectRows(#"Agrupado", each [Category] = "Internal Valuation"),
+				    // Renombrar columnas por categoría
+				    #"Updated Renamed" = Table.RenameColumns(
+				        Table.SelectColumns(#"Updated", {"Deal Name", "As Is Sum", "As Stable Sum", "Valuation Date"}),
+				        {{"As Is Sum", "Updated As Is"}, {"As Stable Sum", "Updated As Stable"}, {"Valuation Date", "Updated Valuation Date"}}
+				    ),
+				    #"Origination Renamed" = Table.RenameColumns(
+				        Table.SelectColumns(#"Origination", {"Deal Name", "As Is Sum", "As Stable Sum", "Valuation Date"}),
+				        {{"As Is Sum", "Origination As Is"}, {"As Stable Sum", "Origination As Stable"}, {"Valuation Date", "Origination Valuation Date"}}
+				    ),
+				    #"Internal Renamed" = Table.RenameColumns(
+				        Table.SelectColumns(#"Internal", {"Deal Name", "As Is Sum", "As Stable Sum", "Valuation Date"}),
+				        {{"As Is Sum", "Internal As Is"}, {"As Stable Sum", "Internal As Stable"}, {"Valuation Date", "Internal Valuation Date"}}
+				    ),
+				    // Obtener lista única de deals
+				    #"Deals" = Table.Distinct(Table.SelectColumns(#"Agrupado", {"Deal Name"})),
+				    // Merge todo
+				    #"Merge1" = Table.NestedJoin(#"Deals", {"Deal Name"}, #"Updated Renamed", {"Deal Name"}, "Updated",
+				        JoinKind.LeftOuter),
+				    #"Expand1" = Table.ExpandTableColumn(#"Merge1", "Updated",
+				        {"Updated As Is", "Updated As Stable", "Updated Valuation Date"}),
+				    #"Merge2" = Table.NestedJoin(#"Expand1", {"Deal Name"}, #"Origination Renamed", {"Deal Name"}, "Origination",
+				        JoinKind.LeftOuter),
+				    #"Expand2" = Table.ExpandTableColumn(#"Merge2", "Origination",
+				        {"Origination As Is", "Origination As Stable", "Origination Valuation Date"}),
+				    #"Merge3" = Table.NestedJoin(#"Expand2", {"Deal Name"}, #"Internal Renamed", {"Deal Name"}, "Internal",
+				        JoinKind.LeftOuter),
+				    #"Expand3" = Table.ExpandTableColumn(#"Merge3", "Internal",
+				        {"Internal As Is", "Internal As Stable", "Internal Valuation Date"}),
+				    // As Is Valuation = Updated si existe, sino Origination
+				    #"As Is Final" = Table.AddColumn(#"Expand3", "As Is Valuation", each
+				        if [#"Updated As Is"] <> null then [#"Updated As Is"]
+				        else [#"Origination As Is"], type number),
+				    // As Stable Valuation = Updated si existe, sino Origination
+				    #"As Stable Final" = Table.AddColumn(#"As Is Final", "As Stable Valuation", each
+				        if [#"Updated As Stable"] <> null then [#"Updated As Stable"]
+				        else [#"Origination As Stable"], type number),
+				    // Valuation Date = Updated si existe, sino Origination
+				    #"Valuation Date Final" = Table.AddColumn(#"As Stable Final", "Valuation Date", each
+				        if [#"Updated Valuation Date"] <> null then [#"Updated Valuation Date"]
+				        else [#"Origination Valuation Date"], type date),
+				    // Traer Principal Balance para LTV
+				    #"Merge PB" = Table.NestedJoin(#"Valuation Date Final", {"Deal Name"},
+				        Table.SelectColumns(Table.SelectRows(dbo_cr83c_assetmanagement, each [cr83c_isactive] = true),
+				            {"cr83c_name", "cr83c_currentprincipalbalance"}),
+				        {"cr83c_name"}, "PB", JoinKind.LeftOuter),
+				    #"Expand PB" = Table.ExpandTableColumn(#"Merge PB", "PB",
+				        {"cr83c_currentprincipalbalance"}, {"Principal Balance"}),
+				    // LTV Calculations
+				    #"LTV As Is" = Table.AddColumn(#"Expand PB", "LTV - As Is", each
+				        if [#"As Is Valuation"] <> null and [#"As Is Valuation"] <> 0 and [#"Principal Balance"] <> null
+				        then [#"Principal Balance"] / [#"As Is Valuation"] * 100
+				        else null, type number),
+				    #"LTV As Is Internal" = Table.AddColumn(#"LTV As Is", "LTV - As Is (Internal)", each
+				        if [#"Internal As Is"] <> null and [#"Internal As Is"] <> 0 and [#"Principal Balance"] <> null
+				        then [#"Principal Balance"] / [#"Internal As Is"] * 100
+				        else null, type number),
+				    #"LTV As Stable Internal" = Table.AddColumn(#"LTV As Is Internal", "LTV - As Stable (Internal)", each
+				        if [#"Internal As Stable"] <> null and [#"Internal As Stable"] <> 0 and [#"Principal Balance"] <> null
+				        then [#"Principal Balance"] / [#"Internal As Stable"] * 100
+				        else null, type number),
+				    // Seleccionar columnas finales
+				    #"Final" = Table.SelectColumns(#"LTV As Stable Internal", {
+				        "Deal Name",
+				        "As Is Valuation",
+				        "Valuation Date",
+				        "LTV - As Is",
+				        "Internal As Is",
+				        "LTV - As Is (Internal)",
+				        "Internal As Stable",
+				        "LTV - As Stable (Internal)",
+				        "Internal Valuation Date"
+				    }),
+				    #"Renombrar Final" = Table.RenameColumns(#"Final",{
+				        {"Internal As Is", "As Is Valuation (Internal)"},
+				        {"Internal As Stable", "As Stable Valuation (Internal)"}
+				    })
+				in
+				    #"Renombrar Final"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

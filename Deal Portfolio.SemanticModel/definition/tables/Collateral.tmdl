@@ -1,0 +1,128 @@
+table Collateral
+	lineageTag: bb35fa33-5e78-4ce4-8146-139b84ce711b
+
+	column Name
+		dataType: string
+		lineageTag: 0664f282-66d4-4682-b8e1-521f55bf70f5
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Collateral Description'
+		dataType: string
+		lineageTag: 603c5126-f5c0-42c0-8a64-aea96670b906
+		summarizeBy: none
+		sourceColumn: cr83c_collateraldescription
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Property Address'
+		dataType: string
+		lineageTag: b174dc45-0e48-4be4-855e-0a6fee30f59b
+		summarizeBy: none
+		sourceColumn: cr83c_propertyaddress
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Property Size'
+		dataType: double
+		lineageTag: 6e7a18ba-ce71-49eb-9458-954c712ed1f9
+		summarizeBy: sum
+		sourceColumn: Property Size
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column cr83c_propertysizetype
+		dataType: int64
+		formatString: 0
+		lineageTag: da1b1196-7601-4d72-8313-da27ddfd24c5
+		summarizeBy: sum
+		sourceColumn: cr83c_propertysizetype
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Property Size Type'
+		dataType: string
+		lineageTag: 426dae5e-58ca-4461-b836-4d4c638f83fc
+		summarizeBy: none
+		sourceColumn: cr83c_propertysizetypename
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Collateral & Securities'
+		dataType: string
+		lineageTag: d9661e84-60ad-4ba2-b9f1-3bfaca78c211
+		summarizeBy: none
+		sourceColumn: cr83c_collateralsecurities
+
+		annotation SummarizationSetBy = Automatic
+
+	column cr83c_geography
+		dataType: int64
+		formatString: 0
+		lineageTag: dee2b917-a3a3-45c8-98ef-bbfbd3654f20
+		summarizeBy: sum
+		sourceColumn: cr83c_geography
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geography
+		dataType: string
+		lineageTag: cab6acf5-6452-413b-8392-53431855f2da
+		summarizeBy: none
+		sourceColumn: cr83c_geographyname
+
+		annotation SummarizationSetBy = Automatic
+
+	column cr83c_legalforeclosure
+		dataType: int64
+		formatString: 0
+		lineageTag: 7c17d547-0afb-4ba0-8d51-bfe2802d78a5
+		summarizeBy: sum
+		sourceColumn: cr83c_legalforeclosure
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' Legal Foreclosure'
+		dataType: string
+		lineageTag: 877882d8-ac96-40a5-bb00-cfaf87df99d6
+		summarizeBy: none
+		sourceColumn: cr83c_legalforeclosurename
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Deal Number'
+		dataType: string
+		lineageTag: ae23e75b-693a-48c3-ac6f-58aa8a5d0fa7
+		summarizeBy: none
+		sourceColumn: cr83c_dealnumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 3a246137-6442-408c-a5b2-f803426d4b18
+		summarizeBy: none
+		sourceColumn: cr83c_state
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Collateral = m
+		mode: import
+		source = ```
+				let                                                                                                                                                                                 Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),                                                                                                      
+				
+				      cr83c_loancollateral = Origen{[Schema="dbo", Item="cr83c_loancollateral"]}[Data],
+				    #"Columnas quitadas" = Table.RemoveColumns(cr83c_loancollateral,{"emailaddress", "importsequencenumber", "overriddencreatedon", "timezoneruleversionnumber", "utcconversiontimezonecode", "cr83c_loancollateralid", "createdon", "createdby", "modifiedon", "modifiedby", "createdonbehalfby", "modifiedonbehalfby", "createdbyname", "createdbyyominame", "createdonbehalfbyname", "createdonbehalfbyyominame", "modifiedbyname", "modifiedbyyominame", "modifiedonbehalfbyname", "modifiedonbehalfbyyominame", "organizationid", "organizationidname", "statecode", "statecodename", "statuscode", "statuscodename", "activityparty", "activitypointer", "adx_inviteredemption", "adx_portalcomment", "annotation", "appointment", "asyncoperation", "connection(cr83c_loancollateralid)", "connection(cr83c_loancollateralid) 2", "cr83c_assetmanagement", "cr83c_collateraloverviewsection1", "email", "fax", "letter", "msdyn_copilottranscript", "msdyn_ocliveworkitem", "msdyn_ocsession", "msfp_alert", "msfp_surveyinvite", "msfp_surveyresponse", "organization", "phonecall", "processsession", "recurringappointmentmaster", "serviceappointment", "sharepointdocumentlocation", "socialactivity", "systemuser(createdby)", "systemuser(createdonbehalfby)", "systemuser(modifiedby)", "systemuser(modifiedonbehalfby)", "task"}),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas quitadas",{{"cr83c_propertysize", "Property Size"}})                                                                                            in                                                                                                                                                                            
+				
+				      #"Columnas con nombre cambiado"
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

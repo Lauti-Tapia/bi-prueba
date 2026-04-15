@@ -1,0 +1,71 @@
+table 'Valuation Labels'
+	lineageTag: 357d38c3-2eb7-4fe9-b170-15ebf47d8716
+
+	measure 'Valuation Value' = ```
+			
+			  SWITCH(
+			      SELECTEDVALUE('Valuation Labels'[ ]),
+			      "As Is Valuation (External)", FORMAT(SELECTEDVALUE('Valuations'[As Is Valuation], 0), "$#,##0"),
+			      "LTV - As Is (External)", FORMAT(SELECTEDVALUE('Valuations'[LTV - As Is], 0) / 100, "0.0%"),
+			      "As Is Valuation (Internal)", FORMAT(SELECTEDVALUE('Valuations'[As Is Valuation (Internal)], 0), "$#,##0"),
+			      "LTV - As Is (Internal)", FORMAT(SELECTEDVALUE('Valuations'[LTV - As Is (Internal)], 0) / 100, "0.0%"),
+			      "As Stable Valuation (Internal)", FORMAT(SELECTEDVALUE('Valuations'[As Stable Valuation (Internal)], 0),
+			  "$#,##0"),
+			      "LTV - As Stable (Internal)", FORMAT(SELECTEDVALUE('Valuations'[LTV - As Stable (Internal)], 0) / 100, "0.0%"),
+			      "-"
+			  )
+			```
+		lineageTag: 77ce4ef5-f590-4884-b5c2-34fad4d2ccd8
+
+	measure 'Valuation Date Display' = ```
+			
+			  VAR _Metric = SELECTEDVALUE('Valuation Labels'[ ])
+			  RETURN                                            
+			  SWITCH(                                                                                                                                                                                     _Metric,
+			      "As Is Valuation (External)", FORMAT(SELECTEDVALUE('Valuations'[Valuation Date]), "MM/DD/YYYY"),                                                                                  
+			      "LTV - As Is (External)", FORMAT(SELECTEDVALUE('Valuations'[Valuation Date]), "MM/DD/YYYY"),                                                                                      
+			      "As Is Valuation (Internal)", FORMAT(SELECTEDVALUE('Valuations'[Internal Valuation Date]), "MM/DD/YYYY"),                                                                               "LTV - As Is (Internal)", FORMAT(SELECTEDVALUE('Valuations'[Internal Valuation Date]), "MM/DD/YYYY"),    
+			      "As Stable Valuation (Internal)", FORMAT(SELECTEDVALUE('Valuations'[Internal Valuation Date]), "MM/DD/YYYY"),                                                                           "LTV - As Stable (Internal)", FORMAT(SELECTEDVALUE('Valuations'[Internal Valuation Date]), "MM/DD/YYYY"),                                                                         
+			      BLANK()                                                                                                                                                                           
+			  )
+			```
+		lineageTag: ec04cf2a-ced6-4234-8e88-515adeb8b42f
+
+	column Sort
+		formatString: 0
+		lineageTag: 0f49567f-e0ce-40a0-91a1-c9575dc8752a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' '
+		lineageTag: ad180e0e-f8d6-46f2-9517-680baf93d15f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+		sortByColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Valuation Labels' = calculated
+		mode: import
+		source = ```
+				
+				  DATATABLE(
+				      " ", STRING,
+				      "Sort", INTEGER,
+				      {
+				          {"As Is Valuation (External)", 5},
+				          {"LTV - As Is (External)", 6},
+				          {"As Is Valuation (Internal)", 1},
+				          {"LTV - As Is (Internal)", 2},
+				          {"As Stable Valuation (Internal)", 3},
+				          {"LTV - As Stable (Internal)", 4}
+				      }
+				  )
+				```
+
+	annotation PBI_Id = 446e2a6426974123b6677388ae2b94b1
+

@@ -1,0 +1,105 @@
+table 'Report Layout'
+	lineageTag: 93dc3ee9-2df1-4164-a1ea-3e5202f2cf16
+
+	column RowType
+		lineageTag: 62a8eb75-14c4-45ad-aa88-4e83e60caad2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [RowType]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Index
+		formatString: 0
+		lineageTag: 77fa0ccf-f7cf-4acd-bd63-2f75238bb131
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Index]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Section
+		lineageTag: 59e71f38-ed17-4b13-88e3-c4fff034d282
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Section]
+		sortByColumn: SectionOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column SectionOrder
+		formatString: 0
+		lineageTag: b5598a88-5c8b-4ec1-9cd5-97b3cef6e0d7
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [SectionOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column TextStyle
+		lineageTag: 348b374a-db72-4555-b230-4bdeb63674cb
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [TextStyle]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' '
+		lineageTag: 33d478ed-ae4f-4795-8661-41281606c4b9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+		sortByColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Report Layout' = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE (
+				    "Index", INTEGER,
+				    "SectionOrder", INTEGER,
+				    "Section", STRING,
+				    " ", STRING,
+				    "RowType", STRING,
+				    "TextStyle", STRING, 
+				    {
+				        -- REVENUE (Orden 1)
+				        { 3,  1, "Revenue", "Adj. GPR",                      "Subtotal", "Bold" },
+				        { 4,  1, "Revenue", "Vacancy",                       "Data",     "Normal" },
+				        { 5,  1, "Revenue", "Concessions",                   "Data",     "Normal" },
+				        { 6,  1, "Revenue", "Bad Debt Loss",                 "Data",     "Normal" },
+				        { 7,  1, "Revenue", "Effective Rental Income",       "Subtotal", "Bold" },
+				        { 8,  1, "Revenue", "Utility Income",                "Data",     "Normal" },
+				        { 9,  1, "Revenue", "Other Income",                  "Data",     "Normal" },
+				        { 10, 1, "Revenue", "Effective Gross Revenue",       "Subtotal", "Bold" },
+				 
+				        -- OPEX (Orden 2)
+				        { 11, 2, "Operating Expenses",    "General & Administrative",      "Data",     "Normal" },
+				        { 12, 2, "Operating Expenses",    "Payroll",                       "Data",     "Normal" },
+				        { 13, 2, "Operating Expenses",    "Sales & Marketing",             "Data",     "Normal" },
+				        { 14, 2, "Operating Expenses",    "Utilities",                     "Data",     "Normal" },
+				        { 15, 2, "Operating Expenses",    "Repairs & Maintenance",         "Data",     "Normal" },
+				        { 16, 2, "Operating Expenses",    "Management Fee",                "Data",     "Normal" },
+				        { 17, 2, "Operating Expenses",    "Turnover",                      "Data",     "Normal" },
+				        { 18, 2, "Operating Expenses",    "Total Controllable Expenses",   "Subtotal", "Bold" },
+				        { 19, 2, "Operating Expenses",    "Property Taxes",                "Data",     "Normal" },
+				        { 20, 2, "Operating Expenses",    "Insurance",                     "Data",     "Normal" },
+				        { 21, 2, "Operating Expenses",    "Total Operating Expenses",      "Subtotal", "Bold" },
+				 
+				        -- NOI (Orden 3)
+				        { 22, 3, "Net Operating Income",     "Net Operating Income",          "Subtotal", "Bold" },
+				 
+				        -- BELOW NOI (Orden 4)
+				        { 23, 4, "Below NOI","CapEx Reserve",                "Data",     "Normal" },
+				        { 24, 4, "Below NOI","Debt Service",                 "Data",     "Normal" },
+				 
+				        -- CASH FLOW (Orden 5)
+				        { 25, 5, "Cash Flow from Operations","Cash Flow from Operations",    "Subtotal", "Bold" }
+				    }
+				)
+				```
+
+	annotation PBI_Id = f46e8846e61f4eec8c3737b8c523c315
+

@@ -1,0 +1,34 @@
+table DimDeals
+	lineageTag: c5356e1c-7273-4d3b-92b9-2edb8da94af2
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: a662dad7-ca36-4ba2-b8e4-90de2b35a819
+		summarizeBy: none
+		sourceColumn: cr83c_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDeals = m
+		mode: import
+		source =
+				let
+				
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				
+				    dbo_cr83c_assetmanagement = Origen{[Schema="dbo",Item="cr83c_assetmanagement"]}[Data],
+				
+				    #"Filas filtradas" = Table.SelectRows(dbo_cr83c_assetmanagement, each ([cr83c_isactive] = true)),
+				
+				    #"Columna seleccionada" = Table.SelectColumns(#"Filas filtradas", {"cr83c_name"}),
+				
+				    #"Duplicados quitados" = Table.Distinct(#"Columna seleccionada")
+				
+				in
+				
+				    #"Duplicados quitados"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

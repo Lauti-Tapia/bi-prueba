@@ -1,0 +1,403 @@
+table 'Deal Overview'
+	lineageTag: e0b10e01-d7af-4e8c-8dcf-531dd9484f0d
+
+	column 'Deal name'
+		dataType: string
+		lineageTag: df8c83f3-fb28-44e9-bcc4-565b90eb36c1
+		summarizeBy: none
+		sourceColumn: Deal Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Original Commitment'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 71eb1282-f4fc-4b38-ada1-c19fbcd512c1
+		summarizeBy: sum
+		sourceColumn: Commitment
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Current Principal Balance'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: db06fe95-3e80-44f4-9290-3178436d48e0
+		summarizeBy: sum
+		sourceColumn: Current Principal Balance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Initial Advance '
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 1d5f46f8-3074-4999-8d27-c13dc4e495d9
+		summarizeBy: sum
+		sourceColumn: Initial Advance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Original Maturity Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 71e7e19c-4f02-4139-8e01-54366ec6fee4
+		summarizeBy: none
+		sourceColumn: Original Maturity Date
+
+		variation Variación
+			isDefault
+			relationship: 5cc962ad-d494-4400-a6c5-8f7b336d04ca
+			defaultHierarchy: LocalDateTable_db4bb562-5fee-4ae2-ba0e-8c60043f5ce7.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Maturity Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 682c53ff-fa19-4cef-b383-d4b562f9cdc5
+		summarizeBy: none
+		sourceColumn: Maturity Date
+
+		variation Variación
+			isDefault
+			relationship: 69998e49-6aa3-413c-8477-c0b70b9d0c42
+			defaultHierarchy: LocalDateTable_022073a8-2907-4e42-9812-6dda6e92da86.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Exchange Rate'
+		dataType: double
+		lineageTag: ae38b8e1-b980-4dd5-a250-45aaf4332cc6
+		summarizeBy: sum
+		sourceColumn: Exchange Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Original Commitment (Base)'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: c1cb86eb-60bb-4c8a-9637-5bdb896760bd
+		summarizeBy: sum
+		sourceColumn: Commitment (Base)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Current Principal Balance (Base)'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 149f2a76-0fa4-4734-aa60-dc72d0ba02ce
+		summarizeBy: sum
+		sourceColumn: Current Principal Balance (Base)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Rate Details'
+		dataType: string
+		lineageTag: 4b0ef2b4-c92d-4547-b1f9-b3aa4f021fee
+		summarizeBy: none
+		sourceColumn: Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Initial Advance  (Base)'
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 795ee386-490e-4406-a98a-d670efd26042
+		summarizeBy: sum
+		sourceColumn: Initial Advance (Base)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column LTV
+		dataType: double
+		lineageTag: 759d721b-0a36-49c7-bff3-f96a5adcf5db
+		summarizeBy: sum
+		sourceColumn: Original LTV
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Cap Table Maturity Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 41646131-2121-483a-8bbd-b391e2221226
+		summarizeBy: none
+		sourceColumn: Cap Table Maturity Date
+
+		variation Variación
+			isDefault
+			relationship: c75ea551-b3f9-495b-8888-cacece5cbe43
+			defaultHierarchy: LocalDateTable_3e87b48e-f66c-47a0-bf94-813bd836b97c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Target Gross IRR (%)'
+		dataType: double
+		lineageTag: 2900716e-47b2-48b1-8a78-3ed28350b3e2
+		summarizeBy: sum
+		sourceColumn: Target Gross IRR (%)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Target Gross Cash Multiple'
+		dataType: double
+		lineageTag: 9e03a709-7b3a-482b-a8dc-cf3dc37458d5
+		summarizeBy: sum
+		sourceColumn: Target Gross Cash Multiple
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Target Net IRR'
+		dataType: double
+		lineageTag: 4bf19315-6b99-4aa1-9766-6854de8c8554
+		summarizeBy: sum
+		sourceColumn: Target Net IRR
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Target Net Cash Multiple'
+		dataType: double
+		lineageTag: 9794bd8b-8429-4ca6-9982-fc6722c83ecf
+		summarizeBy: sum
+		sourceColumn: Target Net Cash Multiple
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Target Levered IRR (%)'
+		dataType: double
+		lineageTag: dc0e13b6-4521-4a23-b972-c877c0749fff
+		summarizeBy: sum
+		sourceColumn: Target Levered IRR (%)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Target Levered Cash Multiple'
+		dataType: double
+		lineageTag: f79ed163-3ca3-4d1a-8d74-27a15516ebc7
+		summarizeBy: sum
+		sourceColumn: Target Levered Cash Multiple
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Closing Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: e1342157-f99d-41b2-b0b3-dad3f9fbb5c4
+		summarizeBy: none
+		sourceColumn: Closing Date
+
+		variation Variación
+			isDefault
+			relationship: 624cfcb3-a7d8-4222-a28f-10eedc35cc99
+			defaultHierarchy: LocalDateTable_0393b1d2-144d-42cc-af7f-c66ac2886569.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Note Rate (Floor)'
+		dataType: string
+		lineageTag: 479e197f-843c-4d23-9a3b-3b0ac996e6af
+		summarizeBy: none
+		sourceColumn: Note Rate (Floor)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loan Type 2'
+		dataType: string
+		lineageTag: f8f727bd-e8dd-481a-88da-93f1595bab0c
+		summarizeBy: none
+		sourceColumn: Loan Type 2
+
+		annotation SummarizationSetBy = Automatic
+
+	column Term
+		dataType: string
+		lineageTag: 0fce772b-ed40-4f84-b2e1-d8991a0f34fe
+		summarizeBy: none
+		sourceColumn: Term
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Extension Options'
+		dataType: string
+		lineageTag: 2cfbf7e8-af91-4f04-b00c-a512ea05fecb
+		summarizeBy: none
+		sourceColumn: Extension Options
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asset Type Primary'
+		dataType: string
+		lineageTag: 0bcfc40d-45f7-409b-a4b5-5c0b6ea1f5f2
+		summarizeBy: none
+		sourceColumn: Asset Type Primary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Guaranty
+		dataType: string
+		lineageTag: c9b989b6-ff56-4b91-8028-4cb0c223c1c6
+		summarizeBy: none
+		sourceColumn: Guaranty
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Asset Type (Marketing)'
+		dataType: string
+		lineageTag: 6d92530b-9625-4aa8-926f-bdcdb3ce83bd
+		summarizeBy: none
+		sourceColumn: Asset Type Marketing
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Deal Overview' = m
+		mode: import
+		source = ```
+				let
+				 
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				 
+				    dbo_cr83c_assetmanagement = Origen{[Schema="dbo",Item="cr83c_assetmanagement"]}[Data],
+				 
+				    #"Filas filtradas" = Table.SelectRows(dbo_cr83c_assetmanagement, each ([cr83c_isactive] = true)),
+				 
+				    #"Columnas seleccionadas" = Table.SelectColumns(#"Filas filtradas",{"cr83c_name",
+				        "cr83c_assettypemarketingname",
+				        "cr83c_originalcommitment", "exchangerate", "cr83c_originalcommitment_base",
+				        "cr83c_currentprincipalbalance", "cr83c_currentprincipalbalance_base", "cr83c_ratedetailsname",
+				        "cr83c_initialadvance", "cr83c_initialadvance_base", "cr83c_originalmaturitydate",
+				        "cr83c_maturitydate", "cr83c_ltv", "cr83c_captablematuritydate",
+				        "cr83c_dealoverviewgeneral2(cr83c_assetmanagementid)",
+				        "cr83c_dealoverviewperformancemetrics(cr83c_assetmanagementid)",
+				        "cra7e_dealservicingterms(cr83c_assetmanagementid)"}),
+				 
+				    #"Expandir General2" = Table.ExpandTableColumn(#"Columnas seleccionadas",
+				        "cr83c_dealoverviewgeneral2(cr83c_assetmanagementid)",
+				        {"cr83c_originalmaturitydate", "cr83c_ratedescription", "cr83c_loantype2name", "cr83c_assettpeprimaryname", "cr83c_guaranty"},
+				        {"General2.cr83c_originalmaturitydate", "General2.cr83c_ratedescription", "General2.cr83c_loantype2", "General2.cr83c_assettpeprimaryname", "General2.cr83c_guaranty"}),
+				 
+				    #"Expandir PerfMetrics" = Table.ExpandTableColumn(#"Expandir General2",
+				        "cr83c_dealoverviewperformancemetrics(cr83c_assetmanagementid)", {"cr83c_targetirr",
+				        "cr83c_targetcashmultiple", "cr83c_targetparticipantirr", "cr83c_targetparticipantcashmultiple",
+				        "cr83c_targetleveredirr", "cr83c_targetleveredcashmultiple", "cr83c_closingdate"},
+				        {"PerfMetrics.cr83c_targetirr", "PerfMetrics.cr83c_targetcashmultiple",
+				        "PerfMetrics.cr83c_targetparticipantirr", "PerfMetrics.cr83c_targetparticipantcashmultiple",
+				        "PerfMetrics.cr83c_targetleveredirr", "PerfMetrics.cr83c_targetleveredcashmultiple",
+				        "PerfMetrics.cr83c_closingdate"}),
+				 
+				    #"Expandir ServicingTerms" = Table.ExpandTableColumn(#"Expandir PerfMetrics",
+				        "cra7e_dealservicingterms(cr83c_assetmanagementid)",
+				        {"cra7e_extensionoptions"},
+				        {"ServicingTerms.cra7e_extensionoptions"}),
+				 
+				    #"Columnas renombradas" = Table.RenameColumns(#"Expandir ServicingTerms",{{"cr83c_name", "Deal Name"},
+				        {"cr83c_assettypemarketingname", "Asset Type Marketing"},
+				        {"cr83c_originalcommitment", "Commitment"}, {"exchangerate", "Exchange Rate"},
+				        {"cr83c_originalcommitment_base", "Commitment (Base)"},
+				        {"cr83c_currentprincipalbalance", "Current Principal Balance"},
+				        {"cr83c_currentprincipalbalance_base", "Current Principal Balance (Base)"},
+				        {"cr83c_ratedetailsname", "Rate"},
+				        {"cr83c_initialadvance", "Initial Advance"},
+				        {"cr83c_initialadvance_base", "Initial Advance (Base)"},
+				        {"cr83c_originalmaturitydate", "Original Maturity Date"},
+				        {"cr83c_maturitydate", "Maturity Date"},
+				        {"cr83c_ltv", "LTV"},
+				        {"cr83c_captablematuritydate", "Cap Table Maturity Date"},
+				        {"General2.cr83c_originalmaturitydate", "Closing Date DNU"},
+				        {"General2.cr83c_ratedescription", "Note Rate (Floor)"},
+				        {"General2.cr83c_loantype2", "Loan Type 2"},
+				        {"General2.cr83c_assettpeprimaryname", "Asset Type Primary"},
+				        {"General2.cr83c_guaranty", "Guaranty_Raw"},
+				        {"ServicingTerms.cra7e_extensionoptions", "Extension Options"},
+				        {"PerfMetrics.cr83c_targetirr", "Target Unlevered IRR"},
+				        {"PerfMetrics.cr83c_targetcashmultiple", "Target Cash Multiple"},
+				        {"PerfMetrics.cr83c_targetparticipantirr", "Target Participant IRR"},
+				        {"PerfMetrics.cr83c_targetparticipantcashmultiple", "Target Participant Cash Multiple"},
+				        {"PerfMetrics.cr83c_targetleveredirr", "Target Levered IRR"},
+				        {"PerfMetrics.cr83c_targetleveredcashmultiple", "Target Levered Cash Multiple"},
+				        {"PerfMetrics.cr83c_closingdate", "Closing Date (PerfMetrics)"}}),
+				 
+				    // 15/03/2026 - Mapeo de valores múltiples de Guaranty separados por coma
+				    #"Guaranty mapeado" = Table.AddColumn(#"Columnas renombradas", "Guaranty", each
+				        let
+				            raw = [Guaranty_Raw],
+				            mapeo = [
+				                #"982240000" = "Recourse",
+				                #"982240001" = "Non-recourse",
+				                #"982240002" = "Completion",
+				                #"982240003" = "Interest",
+				                #"982240004" = "Carry",
+				                #"982240005" = "Payment",
+				                #"591900001" = "Environmental Indemnity",
+				                #"591900002" = "Bad Boy Carveouts",
+				                #"591900003" = "Violation Satisfaction"
+				            ],
+				            valores = if raw <> null then Text.Split(Text.From(raw), ",") else {},
+				            limpios = List.Transform(valores, each Text.Trim(_)),
+				            etiquetas = List.Transform(limpios, each try Record.Field(mapeo, _) otherwise _),
+				            resultado = Text.Combine(etiquetas, ", ")
+				        in
+				            if raw = null then null else resultado, type text),
+				 
+				    #"Quitar Guaranty_Raw" = Table.RemoveColumns(#"Guaranty mapeado", {"Guaranty_Raw"}),
+				 
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Quitar Guaranty_Raw",{{"Cap Table Maturity Date", type date}, {"Closing Date DNU", type date}, {"Closing Date (PerfMetrics)", type date}}),
+				 
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"Closing Date (PerfMetrics)", "Closing Date"}}),
+				 
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas con nombre cambiado",{"Closing Date DNU"}),
+				 
+				    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas quitadas",{{"LTV", "Original LTV"}, {"Target Unlevered IRR", "Target Gross IRR (%)"}, {"Target Cash Multiple", "Target Gross Cash Multiple"}, {"Target Participant IRR", "Target Net IRR"}, {"Target Participant Cash Multiple", "Target Net Cash Multiple"}, {"Target Levered IRR", "Target Levered IRR (%)"}}),
+				 
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Columnas con nombre cambiado1",{{"Maturity Date", type date}}),
+				 
+				    #"Term agregado" = Table.AddColumn(#"Tipo cambiado1", "Term", each
+				        if [Maturity Date] <> null and [Closing Date] <> null
+				        then
+				            let
+				                y = Date.Year([Maturity Date]) - Date.Year([Closing Date]),
+				                m = Date.Month([Maturity Date]) - Date.Month([Closing Date]),
+				                total = y * 12 + m
+				            in
+				                Text.From(total) & " Months"
+				        else null, type text)
+				 
+				in
+				    #"Term agregado"
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

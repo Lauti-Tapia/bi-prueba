@@ -1,0 +1,49 @@
+table 'AssetType Table'
+	lineageTag: 4d13b47a-b96a-4ec5-b9af-0940d53d4718
+
+	measure 'Asset Description Value' = ```
+			
+			  VAR _Metric = SELECTEDVALUE('AssetType Table'[ ])
+			  RETURN
+			  SWITCH(
+			      _Metric,
+			      "Asset Type", SELECTEDVALUE('Deal Overview'[Asset Type (Marketing)]),
+			      "Property Size", FORMAT(SUM(Collateral[Property Size]), "#,0"),
+			      "Location", SELECTEDVALUE(Collateral[Property Address]),
+			      BLANK()
+			  )
+			```
+		lineageTag: 7277ad14-ca19-421b-adf5-f59a8a7ab4f1
+
+	column SortOrder
+		formatString: 0
+		lineageTag: 2fd4e058-853b-4054-84b8-627098f95279
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' '
+		lineageTag: f67b1b17-c0e6-4ca2-a058-eafb67a1a3bb
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'AssetType Table' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				      "SortOrder", INTEGER,
+				      " ", STRING,
+				      {
+				          {1, "Asset Type"},
+				          {2, "Property Size"},
+				          {3, "Location"}
+				      }
+				  )
+
+	annotation PBI_Id = cf264fc5064441c287fe4dba2dfed853
+

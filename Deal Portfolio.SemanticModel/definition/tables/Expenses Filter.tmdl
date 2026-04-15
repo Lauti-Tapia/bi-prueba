@@ -1,0 +1,58 @@
+table 'Expenses Filter'
+	lineageTag: b07abc42-c5d5-4181-85a7-bb73880a60da
+
+	column SortOrder
+		formatString: 0
+		lineageTag: 14adece9-f8b0-49c8-8ac5-fbfac4b60e0a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Item
+		lineageTag: cecff49b-307d-4424-955d-22baddb4ce11
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Item]
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column ItemType
+		lineageTag: fecd25b4-e714-49f6-aba6-24fa5ae2e022
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ItemType]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Expenses Filter' = calculated
+		mode: import
+		source =
+				
+				DATATABLE (
+				    "SortOrder", INTEGER,
+				    "Item", STRING,
+				    "ItemType", STRING,
+				    {
+				        { 1,  "General & Administrative",      "Line Item"  },
+				        { 2,  "Payroll",                       "Line Item"  },
+				        { 3,  "Sales & Marketing",             "Line Item"  },
+				        { 4,  "Utilities",                     "Line Item"  },
+				        { 5,  "Repairs & Maintenance",         "Line Item"  },
+				        { 6,  "Management Fee",                "Line Item"  },
+				        { 7,  "Turnover",                      "Line Item"  },
+				        { 8,  "Total Controllable Expenses",   "Calculated" },
+				        { 9,  "Property Taxes",                "Line Item"  },
+				        { 10, "Insurance",                     "Line Item"  },
+				        { 11, "Total Operating Expenses",      "Calculated" },
+				        { 12, "Net Operating Income",          "Calculated" },
+				        { 13, "CapEx Reserve",                 "Line Item"  },
+				        { 14, "Debt Service",                  "Line Item"  },
+				        { 15, "Cash Flow from Operations",     "Calculated" }
+				    }
+				)
+
+	annotation PBI_Id = da63830b5f1048eb885e0a6ec138291f
+

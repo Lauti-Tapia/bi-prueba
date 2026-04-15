@@ -1,0 +1,51 @@
+table 'Return Metrics Layout'
+	lineageTag: e14b0a27-cca1-46d2-8ceb-5e054c2652ca
+
+	measure 'Return Metrics Value' = ```
+			
+			  VAR _Metric = SELECTEDVALUE('Return Metrics Layout'[ ])
+			  RETURN
+			  SWITCH(
+			      _Metric,
+			      "Target Gross IRR (%)", FORMAT(SUM('Deal Overview'[Target Gross IRR (%)]), "0.00") & "%",
+			      "Target Gross Cash Multiple", FORMAT(SUM('Deal Overview'[Target Gross Cash Multiple]), "0.00") & "x",
+			      "Target Levered IRR (%)", FORMAT(SUM('Deal Overview'[Target Levered IRR (%)]), "0.00") & "%",
+			      "Target Levered Cash Multiple", FORMAT(SUM('Deal Overview'[Target Levered Cash Multiple]), "0.00") & "x",
+			      BLANK()
+			  )
+			```
+		lineageTag: b8e9d7d7-12eb-4522-84fc-143ae5b378cb
+
+	column SortOrder
+		formatString: 0
+		lineageTag: ccca23e3-e235-4615-a828-a6abfb59fab6
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ' '
+		lineageTag: ab3a4454-e6d1-41af-895f-00d7d6a29084
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ ]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Return Metrics Layout' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				      "SortOrder", INTEGER,
+				      " ", STRING,
+				      {
+				          {1, "Target Gross IRR (%)"},
+				          {2, "Target Gross Cash Multiple"},
+				          {3, "Target Levered IRR (%)"},
+				          {4, "Target Levered Cash Multiple"}
+				      }
+				  )
+
+	annotation PBI_Id = 958d2c297cf3494cbf1129bef354cbc8
+

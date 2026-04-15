@@ -1,0 +1,224 @@
+table U_Measures
+	lineageTag: 816afede-0d92-4377-a41d-03823f659005
+
+	measure 'Adjusted GPR $' =
+			
+			CALCULATE(
+			    SUM('Deal Financials'[Amount]),
+			    'Deal Financials'[Internal Line Item] IN { "Gross Potential Rent", "Loss to Lease" }
+			) * [Annual Factor (Apply)]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: d52f0040-e390-4dd3-9d62-f1d24981c706
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Vacancy Items $' =
+			
+			CALCULATE(
+			    SUM('Deal Financials'[Amount]),
+			    'Deal Financials'[Internal Line Item] IN { "Vacancy", "Concessions", "Bad Debt Loss" }
+			) * [Annual Factor (Apply)]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: ee0da7c5-93ba-48c1-8eb2-55c528a92603
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Other Income $' =
+			
+			CALCULATE(
+			    SUM('Deal Financials'[Amount]),
+			    'Deal Financials'[Internal Line Item] IN { "Utility Income", "Other Income" }
+			) * [Annual Factor (Apply)]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 4c57e6d1-30e9-406a-b6be-e939d99c0238
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Controllable OpEx $' =
+			
+			CALCULATE(
+			    SUM('Deal Financials'[Amount]),
+			    'Deal Financials'[Internal Line Item] IN {
+			        "General & Administrative",
+			        "Payroll",
+			        "Sales & Marketing",
+			        "Utilities",
+			        "Repairs & Maintenance",
+			        "Management Fee",
+			        "Turnover"
+			    }
+			) * [Annual Factor (Apply)]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 5377dcda-14b7-4970-ac09-370af6ffce87
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Fixed OpEx $' =
+			
+			CALCULATE(
+			    SUM('Deal Financials'[Amount]),
+			    'Deal Financials'[Internal Line Item] IN { "Property Taxes", "Insurance" }
+			) * [Annual Factor (Apply)]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: b5656606-6f9e-40df-99a5-7a9f42855922
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Below NOI $' =
+			
+			CALCULATE(
+			    SUM('Deal Financials'[Amount]),
+			    'Deal Financials'[Internal Line Item] IN { "CapEx Reserve", "Debt Service" }
+			) * [Annual Factor (Apply)]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: fa7100c3-f518-4e8b-9cd4-a3e524c9e20b
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Effective Rental Income $' =
+			
+			[Adjusted GPR $] + [Vacancy Items $]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: b40b5b04-436e-4e67-8919-c0e3c4974aa7
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Effective Gross Revenue $' =
+			
+			[Effective Rental Income $] + [Other Income $]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 67eb0553-ce9f-4854-bbbd-0bba969230f0
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Total Operating Expenses $' =
+			
+			[Controllable OpEx $] + [Fixed OpEx $]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: ddfcba88-aca7-4d97-a3b7-9eb3467aef1f
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Net Operating Income (NOI) $' =
+			
+			[Effective Gross Revenue $] - [Total Operating Expenses $]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: c7feb5d3-20bf-4f59-8cb1-a53e836d8ce4
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Cash Flow from Operations $' =
+			
+			[Net Operating Income (NOI) $] - [Below NOI $]
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: bbed3172-91ad-44a3-a38f-e4979a0d484f
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Chart Value' =
+			
+			VAR _SelectedRevItems =
+			    VALUES( 'Revenue Filter'[Item] )
+			VAR _SelectedExpItems =
+			    VALUES( 'Expenses Filter'[Item] )
+			
+			// ---------- Bloques base reutilizables ----------
+			VAR _Revenue_Items =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Gross Potential Rent", "Loss to Lease" }
+			    )
+			VAR _Vacancy_Items =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Vacancy", "Concessions", "Bad Debt Loss" }
+			    )
+			VAR _Other_Income =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Utility Income", "Other Income" }
+			    )
+			VAR _Controllable_OpEx =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item]
+			            IN {
+			                "General & Administrative", "Payroll", "Sales & Marketing",
+			                "Utilities", "Repairs & Maintenance", "Management Fee", "Turnover"
+			            }
+			    )
+			VAR _Fixed_OpEx =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "Property Taxes", "Insurance" }
+			    )
+			VAR _Below_NOI =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] IN { "CapEx Reserve", "Debt Service" }
+			    )
+			
+			// ---------- Cálculos compuestos ----------
+			VAR _Adjusted_GPR           = _Revenue_Items
+			VAR _Effective_Rental       = _Adjusted_GPR + _Vacancy_Items
+			VAR _Effective_Gross_Rev    = _Effective_Rental + _Other_Income
+			VAR _Total_OpEx             = _Controllable_OpEx + _Fixed_OpEx
+			VAR _NOI                    = _Effective_Gross_Rev - _Total_OpEx
+			VAR _CashFlow               = _NOI - _Below_NOI
+			
+			// ---------- Función para resolver un item ----------
+			// Usamos SUMX sobre la unión de ambas selecciones
+			VAR _AllSelected =
+			    UNION( _SelectedRevItems, _SelectedExpItems )
+			
+			VAR _Result =
+			    SUMX(
+			        _AllSelected,
+			        VAR _Item = [Item]
+			        RETURN
+			            SWITCH(
+			                TRUE(),
+			                // --- Calculados Revenue ---
+			                _Item = "Adj. GPR",                     _Adjusted_GPR,
+			                _Item = "Effective Rental Income",      _Effective_Rental,
+			                _Item = "Effective Gross Revenue",      _Effective_Gross_Rev,
+			
+			                // --- Calculados Expenses ---
+			                _Item = "Total Controllable Expenses",  _Controllable_OpEx,
+			                _Item = "Total Operating Expenses",     _Total_OpEx,
+			                _Item = "Net Operating Income",         _NOI,
+			                _Item = "Cash Flow from Operations",    _CashFlow,
+			
+			                // --- Line Items directos ---
+			                CALCULATE(
+			                    SUM( 'Deal Financials'[Amount] ),
+			                    'Deal Financials'[Internal Line Item] = _Item
+			                )
+			            )
+			    )
+			
+			RETURN
+			    _Result
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 09c91cf6-bf24-476d-901f-eba8bbf9b912
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Column
+		isHidden
+		formatString: 0
+		lineageTag: 298574c6-17b1-492e-b1b5-ab78c7d78043
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition U_Measures = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = a2368ec3319d482da0e610a75179febe
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

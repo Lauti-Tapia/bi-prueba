@@ -1,0 +1,197 @@
+table 'UID - Categories'
+	isHidden
+	lineageTag: 42011c9b-dfcd-4747-a80e-2d155cc9e649
+
+	column Combinada
+		dataType: string
+		isHidden
+		lineageTag: 4ef77f5a-cdea-4378-a6ce-d82158d4fc11
+		summarizeBy: none
+		sourceColumn: Combinada
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account Category ID'
+		dataType: string
+		isHidden
+		lineageTag: 687878b6-f1ac-43b1-8a15-c4b1ad7efbe4
+		summarizeBy: none
+		sourceColumn: Account Category ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sub-Category ID'
+		dataType: string
+		isHidden
+		lineageTag: e828c63d-6ece-4187-9b92-1439425eade2
+		summarizeBy: none
+		sourceColumn: Sub-Category ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account Category'
+		dataType: string
+		isHidden
+		lineageTag: 44cfcc10-2f4d-4cd3-ba0c-54183350b69c
+		summarizeBy: none
+		sourceColumn: Account Category
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-Category
+		dataType: string
+		isHidden
+		lineageTag: 8cef5d64-85dd-4e68-aefc-bdb715615642
+		summarizeBy: none
+		sourceColumn: Sub-Category
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Internal Line Item'
+		dataType: string
+		isHidden
+		lineageTag: 9f524440-7d5f-4696-a378-ad92ee5a9b46
+		summarizeBy: none
+		sourceColumn: Internal Line Item
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'UID - Categories' = m
+		mode: import
+		source = ```
+				let
+				
+				    Origen = CommonDataService.Database("org98d6617c.crm.dynamics.com"),
+				
+				    Asset = Origen{[Schema="dbo", Item="cr83c_assetmanagement"]}[Data],
+				 
+				
+				    FilasFiltradas = Table.SelectRows(Asset, each [cr83c_isactive] = true),
+				
+				
+				    ExpandDF = Table.ExpandTableColumn(
+				
+				        FilasFiltradas,
+				
+				        "cr83c_dealfinancials",
+				
+				        {
+				
+				            "cr83c_accountcategory", "cr83c_accountcategoryname", 
+				
+				            "cr83c_accountsubcategory", "cr83c_accountsubcategoryname", 
+				
+				            "cr83c_internallineitemname"
+				
+				        },
+				
+				        {
+				
+				            "Account Category ID", "Account Category", 
+				
+				            "Sub-Category ID", "Sub-Category", 
+				
+				            "Internal Line Item"
+				
+				        }
+				
+				    ),
+				 
+				
+				    SoloCols = Table.SelectColumns(
+				
+				        ExpandDF,
+				
+				        {"Account Category ID", "Account Category", "Sub-Category ID", "Sub-Category", "Internal Line Item"}
+				
+				    ),
+				
+				    FiltrarNulos = Table.SelectRows(SoloCols, each ([#"Account Category ID"] <> null)),
+				 
+				
+				    Tipos = Table.TransformColumnTypes(
+				
+				        FiltrarNulos,
+				
+				        {
+				
+				            {"Account Category", type text}, {"Sub-Category", type text},
+				
+				            {"Internal Line Item", type text}, {"Account Category ID", type text},
+				
+				            {"Sub-Category ID", type text}
+				
+				        }
+				
+				    ),
+				 
+				
+				    Unique = Table.Distinct(Tipos),
+				 
+				
+				    Correcciones = Table.AddColumn(Unique, "FixedData", each 
+				
+				        let
+				
+				            AcID = [#"Account Category ID"],
+				
+				            ScID = [#"Sub-Category ID"],
+				
+				            CurrAc = [#"Account Category"],
+				
+				            CurrSc = [#"Sub-Category"]
+				
+				        in
+				
+				
+				            if ScID = "591900014" and AcID = "591900007" then [AC="Below the line", SC="CapEx Reserve"]
+				
+				            else if ScID = "591900017" and AcID = "591900000" then [AC=CurrAc, SC="Other Income"]
+				
+				            else if ScID = "591900015" and AcID = "591900001" then [AC=CurrAc, SC="HOA"]
+				
+				            else if ScID = "591900016" and AcID = "591900002" then [AC=CurrAc, SC="Ground Lease"]
+				
+				            else [AC=CurrAc, SC=CurrSc]
+				
+				    ),
+				 
+				
+				    ExpandFixed = Table.ExpandRecordColumn(Correcciones, "FixedData", {"AC", "SC"}, {"Account Category Fixed", "Sub-Category Fixed"}),
+				 
+				    Combinada = Table.AddColumn(ExpandFixed, "Combinada", each [#"Sub-Category ID"] & "-" & [#"Account Category ID"], type text),
+				
+				    SeleccionFinal = Table.SelectColumns(
+				
+				        Combinada, 
+				
+				        {"Account Category ID", "Account Category Fixed", "Sub-Category ID", "Sub-Category Fixed", "Internal Line Item", "Combinada"}
+				
+				    ),
+				
+				    ResultadoFinal = Table.RenameColumns(SeleccionFinal, {{"Account Category Fixed", "Account Category"}, {"Sub-Category Fixed", "Sub-Category"}}),
+				    #"Columnas reordenadas" = Table.ReorderColumns(ResultadoFinal,{"Combinada", "Account Category ID", "Sub-Category ID", "Account Category", "Sub-Category", "Internal Line Item"})
+				
+				in
+				
+				    #"Columnas reordenadas"
+				```
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
