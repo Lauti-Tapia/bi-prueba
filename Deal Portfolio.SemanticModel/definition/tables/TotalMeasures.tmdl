@@ -333,15 +333,33 @@ table TotalMeasures
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 84bbfbfb-a244-4c73-837e-1a11801942f6
 
+	measure 'Occupancy Rate' = ```
+
+			VAR _GPR =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] = "Gross Potential Rent"
+			    )
+			VAR _Vacancy =
+			    CALCULATE(
+			        SUM( 'Deal Financials'[Amount] ),
+			        'Deal Financials'[Internal Line Item] = "Vacancy"
+			    )
+			RETURN
+			    DIVIDE( _GPR + _Vacancy, _GPR, 0 )
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: f1a2b3c4-d5e6-7890-abcd-ef1234500001
+
 	measure 'BG Color (P&L)' =
-			
+
 			VAR t = SELECTEDVALUE('Report Layout'[RowType])
 			RETURN
 			SWITCH(
 			    TRUE(),
-			    t = "Header",   "#1B5E20",   -- verde
+			    t = "Header",   "#0D3B66",   -- azul oscuro
 			    t = "Highlight","#1B5E20",   -- verde (NOI / Cash Flow)
-			    t = "Subtotal", "#D9D9D9",   -- gris
+			    t = "Subtotal", "#E8E8E8",   -- gris claro
 			    BLANK()
 			)
 		lineageTag: 208bf302-2620-40c9-a386-df4a90d87589

@@ -64,6 +64,7 @@ ref table LocalDateTable_2f17c6b3-1a47-47d7-a22c-475396d21380
 ref table LocalDateTable_9614716c-3c4f-47c7-bb5b-b06eb51be260
 ref table 'Internal Valuation Labels'
 ref table 'External Valuation Labels'
+ref table 'KPI Thresholds'
 
 ref cultureInfo es-MX
 
